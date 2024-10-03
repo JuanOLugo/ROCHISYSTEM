@@ -1,7 +1,9 @@
 const { Router } = require("express");
 const product = require("../db/Models/product.dbmodel");
 const pRouter = Router();
-
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
 pRouter.post("/create", async (req, res) => {
   const { codigo, nombre, PrecioCosto, Precioventa, proveedor, stock } =
     req.body;
@@ -53,15 +55,34 @@ pRouter.post("/delete", async (req, res) => {
 pRouter.post("/update", async (req, res) => {
   const { productos } = req.body;
 
+  console.log(productos);
+
+  const FileName = "registro.json";
+  const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
+
+  // Uso de promesa para escribir el archivo
+
+  fs.writeFileSync(rutaDirectorio, JSON.stringify(productos))
+
+  try {
+    exec("bartend", (err, data) => {
+      console.log(err);
+      console.log(data.toString());
+    });
+    console.log("ejecutado");
+  } catch (error) {
+    console.log("no ejecutado");
+  }
+
   //Find by code if product exist
 
   const updateProducts = productos.map(async (p) => {
-    const existingProduct = await product.findOne({ code: p.codigo});
+    const existingProduct = await product.findOne({ code: p.codigo });
 
     // Suma el stock actual con el nuevo valor
     const newStock = existingProduct.stock + p.cantidad;
 
-    return filterProductAndUpdate = await product.findOneAndUpdate(
+    return (filterProductAndUpdate = await product.findOneAndUpdate(
       { code: p.codigo },
       {
         priceCost: p.precioCosto,
@@ -69,7 +90,7 @@ pRouter.post("/update", async (req, res) => {
         stock: newStock,
         name: p.nombre,
       }
-    );
+    ));
   });
 
   //Si se actualiza enviamos mensaje de error

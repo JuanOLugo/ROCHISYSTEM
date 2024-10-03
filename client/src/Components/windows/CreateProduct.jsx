@@ -4,7 +4,8 @@ import { CreateProductAPI } from '../../Controllers/Product.controller'
 
 export default function CreateProduct() {
   const codeGen = customAlphabet("123456789", 4)
-  const [codigo, setCodigo] = useState(codeGen())
+  //codeGen()
+  const [codigo, setCodigo] = useState("")
   const [nombre, setNombre] = useState('')
   const [PrecioCosto, setPrecioCosto] = useState("")
   const [Precioventa, setPrecioventa] = useState("")
@@ -17,7 +18,8 @@ export default function CreateProduct() {
     const dataToSend = { codigo, nombre, PrecioCosto, Precioventa ,proveedor, stock }
     try {
       await CreateProductAPI(dataToSend)
-      setCodigo(codeGen())  
+      //codeGen()
+      setCodigo("")  
       setNombre("")
       setPrecioCosto("")
       setPrecioventa("")
@@ -40,7 +42,7 @@ export default function CreateProduct() {
                 Código de Producto
               </label>
               <input
-              readOnly
+              //readOnly
                 id="codigo"
                 type="text"
                 value={codigo}

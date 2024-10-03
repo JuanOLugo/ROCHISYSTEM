@@ -57,11 +57,11 @@ export default function SeeSells() {
         <TableBody >
           {facturas.map((factura) => (
             <TableRow key={factura._id}>
-              <TableCell>{factura._id}</TableCell>
-              <TableCell>{factura.date}</TableCell>
-              <TableCell>{factura.sellerName}</TableCell>
-              <TableCell>${factura.totalInvoice.toLocaleString("es-CO")}</TableCell>
-              <TableCell>{factura.payMethod}</TableCell>
+              <TableCell className="border border-blue-500  ">{factura._id}</TableCell>
+              <TableCell className="border border-blue-500  ">{factura.date}</TableCell>
+              <TableCell className="border border-blue-500  ">{factura.sellerName}</TableCell>
+              <TableCell className="border border-blue-500  ">${factura.totalInvoice.toLocaleString("es-CO")}</TableCell>
+              <TableCell className="border border-blue-500  ">{factura.payMethod}</TableCell>
               <TableCell >
                 <Button color="danger" auto className='mx-2' onClick={() => eliminarFactura(factura._id)}>
                   Anular

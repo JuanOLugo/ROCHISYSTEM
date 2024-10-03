@@ -39,16 +39,17 @@ function Invoice({ isOpen, onOpen, onOpenChange, data, setData }) {
                   {productList.map((e, i) => {
                     return (
                       <TableRow key={i}>
-                        <TableCell>{e.code}</TableCell>
-                        <TableCell>{e.name}</TableCell>
-                        <TableCell>{e.priceSell.toLocaleString("es-CO")}</TableCell>
-                        <TableCell>%{e.discount}</TableCell>
-                        <TableCell>{e.amount}</TableCell>
+                        <TableCell className="border border-blue-500  ">{e.code}</TableCell>
+                        <TableCell className="border border-blue-500  ">{e.name}</TableCell>
+                        <TableCell className="border border-blue-500  ">{e.priceSell.toLocaleString("es-CO")}</TableCell>
+                        <TableCell className="border border-blue-500  ">%{e.discount}</TableCell>
+                        <TableCell className="border border-blue-500  ">{e.amount}</TableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
+              <h1 className="font-bold text-2xl">Total: ${totalInvoice.toLocaleString("es-CO")}</h1>
             </ModalBody>
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>

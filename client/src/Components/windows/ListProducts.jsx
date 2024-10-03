@@ -121,15 +121,15 @@ export default function ListProduct() {
           <TableColumn>Stock</TableColumn>
           <TableColumn>Acciones</TableColumn>
         </TableHeader>
-        <TableBody>
+        <TableBody className="border rounded-lg">
           {filteredProducts.map((product) => (
-            <TableRow key={product._id}>
-              <TableCell>{product.code}</TableCell>
-              <TableCell>{product.name}</TableCell>
-              <TableCell>${product.priceCost.toLocaleString("es-co")}</TableCell>
-              <TableCell>${product.priceSell.toLocaleString("es-co")}</TableCell>
-              <TableCell>{product.supplier}</TableCell>
-              <TableCell>{product.stock}</TableCell>
+            <TableRow key={product._id} className="">
+              <TableCell className="border border-blue-500  ">{product.code}</TableCell>
+              <TableCell className="border border-blue-500  ">{product.name}</TableCell>
+              <TableCell className="border border-blue-500  ">${product.priceCost.toLocaleString("es-co")}</TableCell>
+              <TableCell className="border border-blue-500  ">${product.priceSell.toLocaleString("es-co")}</TableCell>
+              <TableCell className="border border-blue-500  ">{product.supplier}</TableCell>
+              <TableCell className="border border-blue-500  ">{product.stock}</TableCell>
               <TableCell>
                 <Button
                   color="error"

@@ -39,8 +39,12 @@ export default function Navbar() {
       action: "see_sells",
     },
     {
-      texto: "Registro de ventas de hoy",
+      texto: "Registrar inventario",
       action: "see_product_sells",
+    },
+    {
+      texto: "Abrir ventana",
+      href: "http://localhost:5173"
     },
   ];
 
@@ -57,7 +61,9 @@ export default function Navbar() {
           </div>
           <div className="hidden md:flex items-center space-x-1">
             {opcionesMenu.map((opcion, index) => (
-              <button
+              <div>
+                {
+                opcion.href ? <a href={opcion.href}  className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300" target="_blank">{opcion.texto}</a> : <button
                 key={index}
                 onClick={() =>
                   setPrincipalWindows(HandlePrincipalWindow(opcion.action))
@@ -66,6 +72,8 @@ export default function Navbar() {
               >
                 {opcion.texto}
               </button>
+              }
+              </div>
             ))}
           </div>
           <div className="md:hidden flex items-center">
@@ -90,6 +98,7 @@ export default function Navbar() {
             {opcion.texto}
           </button>
         ))}
+        
       </div>
     </nav>
   );
