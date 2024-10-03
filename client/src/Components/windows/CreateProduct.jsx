@@ -6,19 +6,21 @@ export default function CreateProduct() {
   const codeGen = customAlphabet("123456789", 4)
   const [codigo, setCodigo] = useState(codeGen())
   const [nombre, setNombre] = useState('')
-  const [precio, setPrecio] = useState("")
+  const [PrecioCosto, setPrecioCosto] = useState("")
+  const [Precioventa, setPrecioventa] = useState("")
   const [proveedor, setProveedor] = useState('')
-  const [stock, setStock] = useState('')
+  const [stock, setStock] = useState("")
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     // Aquí iría la lógica para guardar el producto
-    const dataToSend = { codigo, nombre, precio, proveedor, stock }
+    const dataToSend = { codigo, nombre, PrecioCosto, Precioventa ,proveedor, stock }
     try {
       await CreateProductAPI(dataToSend)
       setCodigo(codeGen())  
       setNombre("")
-      setPrecio("")
+      setPrecioCosto("")
+      setPrecioventa("")
       setProveedor("")
       setStock("")
     } catch (error) {
@@ -64,18 +66,34 @@ export default function CreateProduct() {
             </div>
             <div>
               <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-1">
-                Precio del Producto
+                Precio de costo
               </label>
               <input
                 id="precio"
                 type="number"
-                value={precio}
-                onChange={(e) => setPrecio(e.target.value)}
+                value={PrecioCosto}
+                onChange={(e) => setPrecioCosto(e.target.value)}
                 placeholder="Ingrese el precio del producto"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
+
+            <div>
+              <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-1">
+                Precio de venta
+              </label>
+              <input
+                id="precio"
+                type="number"
+                value={Precioventa}
+                onChange={(e) => setPrecioventa(e.target.value)}
+                placeholder="Ingrese el precio del producto"
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+              />
+            </div>
+
             <div>
               <label htmlFor="proveedor" className="block text-sm font-medium text-gray-700 mb-1">
                 Proveedor (Opcional)
@@ -97,7 +115,7 @@ export default function CreateProduct() {
                 id="stock"
                 type="number"
                 value={stock}
-                onChange={(e) => setStock(e.target.value)}
+                onChange={(e) => setStock(parseInt(e.target.value))}
                 placeholder="Ingrese el stock del producto"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"

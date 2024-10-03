@@ -39,16 +39,16 @@ export default function ListProduct() {
         .toLowerCase()
         .includes(nameFilter.toLowerCase());
       const matchesMinPrice =
-        minPrice === "" || product.price >= parseFloat(minPrice);
+        minPrice === "" || product.priceSell >= parseFloat(minPrice);
       const matchesMaxPrice =
-        maxPrice === "" || product.price <= parseFloat(maxPrice);
+        maxPrice === "" || product.priceSell <= parseFloat(maxPrice);
       return matchesName && matchesMinPrice && matchesMaxPrice;
     })
     .sort((a, b) => {
       if (sortOrder === "asc") {
-        return a.price - b.price;
+        return a.priceSell - b.priceSell;
       } else {
-        return b.price - a.price;
+        return b.priceSell - a.priceSell;
       }
     });
 
@@ -100,12 +100,22 @@ export default function ListProduct() {
             onClick={toggleSortOrder}
             className="cursor-pointer flex items-center "
           >
-            Precio{" "}
-            {sortOrder === "asc" ? (
-              <FaLongArrowAltDown className="mx-1" />
+            <h1 className="flex">Precio Costo{" "} <label htmlFor="">{sortOrder === "asc" ? (
+              <FaLongArrowAltDown className="mx-1 " />
             ) : (
-              <FaLongArrowAltUp className="mx-1" />
-            )}
+              <FaLongArrowAltUp className="mx-1 " />
+            )}</label></h1>
+          </TableColumn>
+          <TableColumn
+            onClick={toggleSortOrder}
+            className="cursor-pointer "
+          >
+            <h1 className="flex">Precio Venta{" "} <label htmlFor="">{sortOrder === "asc" ? (
+              <FaLongArrowAltDown className="mx-1 " />
+            ) : (
+              <FaLongArrowAltUp className="mx-1 " />
+            )}</label></h1>
+            
           </TableColumn>
           <TableColumn>Proveedor</TableColumn>
           <TableColumn>Stock</TableColumn>
@@ -116,7 +126,8 @@ export default function ListProduct() {
             <TableRow key={product._id}>
               <TableCell>{product.code}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>${product.price.toLocaleString("es-co")}</TableCell>
+              <TableCell>${product.priceCost.toLocaleString("es-co")}</TableCell>
+              <TableCell>${product.priceSell.toLocaleString("es-co")}</TableCell>
               <TableCell>{product.supplier}</TableCell>
               <TableCell>{product.stock}</TableCell>
               <TableCell>
@@ -134,9 +145,6 @@ export default function ListProduct() {
                   auto
                   onClick={() => handleDelete(product._id)}
                 >
-                  <div className="bg-blue-800 p-2 rounded-xl">
-                    <RiPencilFill className="text-xl text-white"/>
-                  </div>
                 </Button>
               </TableCell>
             </TableRow>

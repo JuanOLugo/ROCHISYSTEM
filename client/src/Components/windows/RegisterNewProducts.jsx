@@ -1,38 +1,38 @@
 import { useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
-import { GetProductAPI } from "../../Controllers/Product.controller";
-import { format } from 'date-fns';
-export default function CreateInvoice() {
+import { GetProductAPI, UpdateProductsAPI } from "../../Controllers/Product.controller";
+
+
+export default function RegisterNewProducts() {
   const [nombreCliente, setNombreCliente] = useState("");
   const [identificacionCliente, setIdentificacionCliente] = useState("");
   const [nombreVendedor, setNombreVendedor] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const date = new Date();
-  const formattedDate = format(date, 'yyyy-MM-dd');
+
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
-  const [precio, setPrecio] = useState(0);
-  const [descuento, setDescuento] = useState(0);
-  const [cantidad, setCantidad] = useState(1);
-  const [isFilterBycode, setisFilterBycode] = useState(false);
+  const [precioCosto, setprecioCosto] = useState(null);
+  const [precioVenta, setprecioVenta] = useState(null);
+  const [cantidad, setCantidad] = useState("");
+  const [isFilterBycode, setisFilterBycode] = useState(false)
   const [productos, setProductos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
   const [DBProducts, setDBProducts] = useState(null);
-  const [fullInvoice, setfullInvoice] = useState(null);
-  const [idIndividualProduct, setidIndividualProduct] = useState(null)
-  const [individualMaxProduct, setindividualMaxProduct] = useState(0)
+  const [fullRegister, setFullRegister] = useState(null);
+
   useEffect(() => {
     const data = new Promise((res, rej) => {
       const data = GetProductAPI();
       data ? res(data) : rej({ message: "Error" });
     });
     data.then((data) => setDBProducts(data.data));
-  }, [productos]);
+  }, []);
 
   const agregarProducto = (e) => {
     e.preventDefault();
     if (editandoId !== null) {
+      
       setProductos(
         productos.map((p) =>
           p.id === editandoId
@@ -40,58 +40,44 @@ export default function CreateInvoice() {
                 ...p,
                 codigo,
                 nombre: nombreProducto,
-                precio,
-                descuento,
+                precioCosto,
+                precioVenta,
                 cantidad,
               }
             : p
         )
       );
       setEditandoId(null);
-      setisFilterBycode(false);
+      setisFilterBycode(false)
     } else {
-      const ff = productos.filter((e) => e.codigo == codigo);
-      if (ff.length > 0) {
-        const findIfProductExistIn = ff.reduce((acumulador, producto) => {
-          if (producto.codigo === codigo) {
-            return producto.cantidad + cantidad;
-          }
-          return acumulador;
-        }, null);
-
-        ff[0].cantidad = findIfProductExistIn;
-      } else {
-        setProductos([
-          ...productos,
-          {
-            _id: idIndividualProduct,
-            codigo,
-            nombre: nombreProducto,
-            precio,
-            descuento,
-            cantidad,
-          },
-        ]);
-      }
+      setProductos([
+        ...productos,
+        {
+          id: Date.now(),
+          codigo,
+          nombre: nombreProducto,
+          precioCosto,
+          precioVenta,
+          cantidad,
+        },
+      ]);
     }
     setCodigo("");
     setNombreProducto("");
-    setPrecio(0);
-    setDescuento(0);
-    setCantidad(1);
-    setisFilterBycode(false);
-    setidIndividualProduct(null)
-    setindividualMaxProduct(100)
+    setprecioCosto("");
+    setprecioVenta("")
+    setCantidad("");
+    setisFilterBycode(false)
   };
 
   const editarProducto = (id) => {
     const producto = productos.find((p) => p.id === id);
-    setisFilterBycode(true);
+    setisFilterBycode(true)
     if (producto) {
       setCodigo(producto.codigo);
       setNombreProducto(producto.nombre);
-      setPrecio(producto.precio);
-      setDescuento(producto.descuento);
+      setprecioCosto(producto.precioCosto);
+      setprecioVenta(producto.precioVenta);
       setCantidad(producto.cantidad);
       setEditandoId(id);
     }
@@ -101,30 +87,20 @@ export default function CreateInvoice() {
     setProductos(productos.filter((p) => p.id !== id));
   };
 
-  const calcularTotal = () => {
-    return productos.reduce((total, producto) => {
-      return (
-        total +
-        producto.precio * producto.cantidad * (1 - producto.descuento / 100)
-      );
-    }, 0);
-  };
 
-  const finishFactura = () => {
+
+  
+  const guardarFactura = async () => {
     // Aquí iría la lógica para guardar la factura
     if (productos.length > 0) {
-      setfullInvoice({
-        nombreCliente,
-        identificacionCliente,
-        nombreVendedor,
-        productos,
-        total: calcularTotal(),
-        totalMoney: 0,
-        date: formattedDate,
-        paymentMethod: null
-      });
+      try {
+        UpdateProductsAPI({productos})
+        alert("Registrados correctamente")
+        setProductos([])
+      } catch (error) {
+        alert(error)
+      }
 
-      onOpen();
     } else alert("No hay productos que facturar");
   };
 
@@ -133,60 +109,7 @@ export default function CreateInvoice() {
       <div className="space-y-6">
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4 text-primary">
-            Información del Cliente y Vendedor
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label
-                htmlFor="nombreCliente"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Nombre del Cliente (Opcional)
-              </label>
-              <input
-                id="nombreCliente"
-                type="text"
-                value={nombreCliente}
-                onChange={(e) => setNombreCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="identificacionCliente"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Identificación del Cliente (Opcional)
-              </label>
-              <input
-                id="identificacionCliente"
-                type="text"
-                value={identificacionCliente}
-                onChange={(e) => setIdentificacionCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="nombreVendedor"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Nombre del Vendedor (Opcional)
-              </label>
-              <input
-                id="nombreVendedor"
-                type="text"
-                value={nombreVendedor}
-                onChange={(e) => setNombreVendedor(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
-            Agregar Producto
+            Actualizar producto
           </h2>
           <form
             onSubmit={agregarProducto}
@@ -208,15 +131,14 @@ export default function CreateInvoice() {
                   const filterProduct = DBProducts.filter(
                     (product) => product.code == e.target.value
                   );
-
+                  
                   if (filterProduct[0]) {
                     setNombreProducto(filterProduct[0].name);
-                    setPrecio(filterProduct[0].priceSell);
-                    setisFilterBycode(true);
-                    setidIndividualProduct(filterProduct[0]._id)
-                    setindividualMaxProduct(filterProduct[0].stock)
-                  } else {
-                    setisFilterBycode(false);
+                    setisFilterBycode(true)
+                    setprecioCosto(filterProduct[0].priceCost)
+                    setprecioVenta(filterProduct[0].priceSell)
+                  }else{
+                    setisFilterBycode(false)
                   }
                 }}
                 required
@@ -242,36 +164,32 @@ export default function CreateInvoice() {
             </div>
             <div>
               <label
-                htmlFor="precio"
+                htmlFor="costPrice"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Precio
+                Precio de costo
               </label>
               <input
-                id="precio"
+                id="costPrice"
                 type="number"
-                value={precio}
-                onChange={(e) => setPrecio(e.target.value)}
-                min="0"
-                step="0.01"
+                value={precioCosto}
+                onChange={(e) => setprecioCosto(e.target.value)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
-                htmlFor="descuento"
+                htmlFor="sellPrice"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Descuento (%)
+                Precio de venta
               </label>
               <input
-                id="descuento"
+                id="sellPrice"
                 type="number"
-                value={descuento}
-                onChange={(e) => setDescuento(e.target.value)}
-                min="0"
-                max="100"
+                value={precioVenta}
+                onChange={(e) => setprecioVenta(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
@@ -287,8 +205,6 @@ export default function CreateInvoice() {
                 type="number"
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
-                min="1"
-                max={individualMaxProduct}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
@@ -300,7 +216,7 @@ export default function CreateInvoice() {
               >
                 {editandoId !== null
                   ? "Actualizar Producto"
-                  : "Agregar Producto"}
+                  : "Agregar Producto Registrado"}
               </button>
             </div>
           </form>
@@ -321,16 +237,13 @@ export default function CreateInvoice() {
                     Nombre
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Precio
+                    Precio Costo
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Descuento
+                    Precio Venta
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Cantidad
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Acciones
@@ -339,7 +252,7 @@ export default function CreateInvoice() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {productos.map((producto) => (
-                  <tr key={producto.id}>
+                  <tr key={producto._id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {producto.codigo}
                     </td>
@@ -347,21 +260,13 @@ export default function CreateInvoice() {
                       {producto.nombre}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ${producto.precio.toLocaleString("es-co")}
+                      ${producto.precioCosto.toLocaleString("es-co")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {producto.descuento}%
+                      ${producto.precioVenta.toLocaleString("es-co")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {producto.cantidad}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      $
-                      {(
-                        producto.precio *
-                        producto.cantidad *
-                        (1 - producto.descuento / 100)
-                      ).toLocaleString("es-co")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
@@ -383,26 +288,15 @@ export default function CreateInvoice() {
             </table>
           </div>
           <div className="mt-6 flex justify-between items-center">
-            <span className="text-xl font-bold">
-              Total: ${calcularTotal().toLocaleString("es-co")}
-            </span>
             <button
-              onClick={finishFactura}
+              onClick={guardarFactura}
               className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
             >
-              Guardar Factura
+              Guardar registro
             </button>
           </div>
         </div>
       </div>
-
-      <FinishInvoice
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onOpenChange={onOpenChange}
-        data={fullInvoice}
-        setProductos={setProductos}
-      />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import CreateProduct from "./Components/windows/CreateProduct";
 import CreateInvoice from "./Components/windows/CreateInvoice";
 import ListProducts from "./Components/windows/ListProducts";
 import SeeSells from "./Components/windows/SeeSells";
-import ProductsSells from "./Components/windows/ProductsSells";
+import RegisterNewProducts from "./Components/windows/RegisterNewProducts";
 
 function App() {
   const { principalWindows, setPrincipalWindows } = useContext(WinContext);
@@ -21,7 +21,7 @@ function App() {
         {principalWindows.create_invoice ? <CreateInvoice /> : null}
         {principalWindows.see_product_list ? <ListProducts /> : null}
         {principalWindows.see_sells ? <SeeSells /> : null}
-        {principalWindows.see_product_sells ? <ProductsSells /> : null}
+        {principalWindows.see_product_sells ? <RegisterNewProducts /> : null}
      
     </>
   );

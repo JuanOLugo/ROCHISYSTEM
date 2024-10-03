@@ -11,6 +11,7 @@ app.use(express.json())
 
 //Api Routes
 app.use("/api/product", require("./Routes/Product.routes"))
+app.use("/api/invoice", require("./Routes/Invoice.Routes"))
 
 
 // Puerto del servidor

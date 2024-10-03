@@ -1,14 +1,14 @@
 import axios from "axios";
 
-const proxy = "http://localhost:8528/api/product/";
+const proxy = "http://localhost:8528/api/invoice/";
 
-export const CreateProductAPI = async (data) => {
+export const CreateInvoiceAPI = async (data) => {
   const response = await axios.post(proxy + "create", data);
   return response;
 };
 
-export const GetProductAPI = async (data) => {
-  const response = await axios.get(proxy + "get", data);
+export const GetInvoiceAPI = async (data) => {
+  const response = await axios.post(proxy + "get", data);
   return response;
 };
 
@@ -17,7 +17,7 @@ export const UpdateProductsAPI = async (data) => {
   return response;
 };
 
-export const DeleteProductAPI = async (data) => {
+export const DeleteInvoiceAPI = async (data) => {
     const response = await axios.post(proxy + "delete", data);
     return response;
   };

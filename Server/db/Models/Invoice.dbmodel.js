@@ -8,15 +8,21 @@ const invoiceSchema = new Schema({
   sellerName: String,
   productList: [
     {
-      product: Schema.ObjectId,
-      discount: Number,
-      amount: Number,
+        _id: String ,
+        code: String,
+        name: String,
+        priceSell: Number,
+        amount:Number,
+        discount:Number
+      
     },
   ],
   totalInvoice: Number,
   moneyGave: Number,
+  date: String,
+  payMethod: String,
+  
 });
-
 
 //Creating Model
 const invoiceModel = model("invoices", invoiceSchema);

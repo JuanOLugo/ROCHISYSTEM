@@ -5,9 +5,10 @@ const { Schema, model } = require("mongoose");
 const productSchema = new Schema({
   code: String,
   name: String,
-  price: Number,
+  priceCost: Number,
+  priceSell: Number,
   supplier: String,
-  stock: String,
+  stock: Number,
 });
 
 //Creating Model
