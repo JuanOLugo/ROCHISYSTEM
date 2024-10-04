@@ -1,48 +1,88 @@
-import { useState } from 'react'
-import {customAlphabet} from "nanoid"
-import { CreateProductAPI } from '../../Controllers/Product.controller'
-
+import { useEffect, useState } from "react";
+import { customAlphabet } from "nanoid";
+import { CreateProductAPI } from "../../Controllers/Product.controller";
+import { GetProductAPI } from "../../Controllers/Product.controller";
 export default function CreateProduct() {
-  const codeGen = customAlphabet("123456789", 4)
-  //codeGen()
-  const [codigo, setCodigo] = useState("")
-  const [nombre, setNombre] = useState('')
-  const [PrecioCosto, setPrecioCosto] = useState("")
-  const [Precioventa, setPrecioventa] = useState("")
-  const [proveedor, setProveedor] = useState('')
-  const [stock, setStock] = useState("")
+  const codeGen = customAlphabet("123456789", 4);
+
+  const [Products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const data = new Promise((res, rej) => {
+      const data = GetProductAPI();
+      data ? res(data) : rej({ message: "Error" });
+    });
+    data.then((data) => setProducts(data.data));
+  }, []);
+
+  const verifyIfCodeExist = () => {
+    const AllProductCodes = Products.map((e) => e.code);
+    console.log(AllProductCodes)
+    let newNumber;
+    do {
+      newNumber = codeGen();
+    } while (AllProductCodes.includes(newNumber));
+    setCodigo(newNumber);
+  };
+
+  useEffect(() => {
+    if(Products.length > 0){
+      verifyIfCodeExist();
+    }
+  }, [Products]);
+
+  const [codigo, setCodigo] = useState("");
+  const [nombre, setNombre] = useState("");
+  const [PrecioCosto, setPrecioCosto] = useState("");
+  const [Precioventa, setPrecioventa] = useState("");
+  const [proveedor, setProveedor] = useState("");
+  const [stock, setStock] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     // Aquí iría la lógica para guardar el producto
-    const dataToSend = { codigo, nombre, PrecioCosto, Precioventa ,proveedor, stock }
+    const dataToSend = {
+      codigo,
+      nombre,
+      PrecioCosto,
+      Precioventa,
+      proveedor,
+      stock,
+    };
     try {
-      await CreateProductAPI(dataToSend)
+      await CreateProductAPI(dataToSend);
       //codeGen()
-      setCodigo("")  
-      setNombre("")
-      setPrecioCosto("")
-      setPrecioventa("")
-      setProveedor("")
-      setStock("")
+      setCodigo("");
+      setNombre("");
+      setPrecioCosto("");
+      setPrecioventa("");
+      setProveedor("");
+      setStock("");
+
+      const data = await GetProductAPI();
+      setProducts(data.data);
     } catch (error) {
-      alert(error.response.data.message)
+      alert(error.response.data.message);
     }
-    
-  }
+  };
 
   return (
     <div className="container mx-auto p-4 ">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4 text-primary">Crear Producto</h2>
+          <h2 className="text-2xl font-bold mb-4 text-primary">
+            Crear Producto
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="codigo" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="codigo"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Código de Producto
               </label>
               <input
-              //readOnly
+                //readOnly
                 id="codigo"
                 type="text"
                 value={codigo}
@@ -53,7 +93,10 @@ export default function CreateProduct() {
               />
             </div>
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="nombre"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Nombre del Producto
               </label>
               <input
@@ -67,7 +110,10 @@ export default function CreateProduct() {
               />
             </div>
             <div>
-              <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="precio"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Precio de costo
               </label>
               <input
@@ -82,7 +128,10 @@ export default function CreateProduct() {
             </div>
 
             <div>
-              <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="precio"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Precio de venta
               </label>
               <input
@@ -97,7 +146,10 @@ export default function CreateProduct() {
             </div>
 
             <div>
-              <label htmlFor="proveedor" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="proveedor"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Proveedor (Opcional)
               </label>
               <input
@@ -110,7 +162,10 @@ export default function CreateProduct() {
               />
             </div>
             <div>
-              <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="stock"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Stock
               </label>
               <input
@@ -131,9 +186,11 @@ export default function CreateProduct() {
             </button>
           </form>
         </div>
-        
+
         <div className="hidden md:block w-64 bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4 text-primary">Código de Barras</h2>
+          <h2 className="text-2xl font-bold mb-4 text-primary">
+            Código de Barras
+          </h2>
           <div className="flex items-center justify-center h-64 bg-gray-100 rounded-md">
             <svg
               className="w-24 h-24 text-gray-400"
@@ -150,5 +207,5 @@ export default function CreateProduct() {
         </div>
       </div>
     </div>
-  )
+  );
 }
