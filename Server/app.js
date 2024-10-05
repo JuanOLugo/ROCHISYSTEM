@@ -1,7 +1,7 @@
 const express = require("express")
 const cors = require("cors")
 
-const app = express()
+ const app = express()
 
 //Policy cors
 app.use(cors())
@@ -17,7 +17,7 @@ app.use("/api/invoice", require("./Routes/Invoice.Routes"))
 // Puerto del servidor
 const port = 8528
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     //Mensaje de OK
     const messageOK = "Server ready on port: "
     console.log(messageOK + port)
@@ -25,3 +25,6 @@ app.listen(port, () => {
     //Start db
     require("./db/start.db")('mongodb://127.0.0.1:27017/inventario_rochi')
 })
+
+
+

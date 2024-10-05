@@ -25,7 +25,7 @@ export default function ListProduct() {
       const data = GetProductAPI();
       data ? res(data) : rej({ message: "Error" });
     });
-    data.then((data) => setProducts(data.data));
+    data.then((data) => setProducts(data.data)).catch((err) => console.log("Recuerda que: " + err.response.data.message));;
   }, []);
 
   const handleDelete = useCallback(async (id) => {

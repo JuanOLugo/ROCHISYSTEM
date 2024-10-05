@@ -12,21 +12,25 @@ export default function CreateProduct() {
       const data = GetProductAPI();
       data ? res(data) : rej({ message: "Error" });
     });
-    data.then((data) => setProducts(data.data));
+    data.then((data) => setProducts(data.data)).catch((err) => setProducts([]));
   }, []);
 
   const verifyIfCodeExist = () => {
-    const AllProductCodes = Products.map((e) => e.code);
-    console.log(AllProductCodes)
-    let newNumber;
-    do {
-      newNumber = codeGen();
-    } while (AllProductCodes.includes(newNumber));
-    setCodigo(newNumber);
+    if (Products.length === 0) {
+      setCodigo(codeGen())
+    } else {
+      const AllProductCodes = Products.map((e) => e.code);
+      console.log(AllProductCodes);
+      let newNumber;
+      do {
+        newNumber = codeGen();
+      } while (AllProductCodes.includes(newNumber));
+      setCodigo(newNumber);
+    }
   };
 
   useEffect(() => {
-    if(Products.length > 0){
+    if (Products) {
       verifyIfCodeExist();
     }
   }, [Products]);
@@ -37,6 +41,7 @@ export default function CreateProduct() {
   const [Precioventa, setPrecioventa] = useState("");
   const [proveedor, setProveedor] = useState("");
   const [stock, setStock] = useState("");
+  const [ProductIs, setProductIs] = useState("old");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +52,7 @@ export default function CreateProduct() {
       PrecioCosto,
       Precioventa,
       proveedor,
-      stock,
+      stock: stock == "" ? 0 : stock,
     };
     try {
       await CreateProductAPI(dataToSend);
@@ -161,23 +166,44 @@ export default function CreateProduct() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
+
             <div>
               <label
                 htmlFor="stock"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                Stock
+                Antiguedad Del producto
               </label>
-              <input
-                id="stock"
-                type="number"
-                value={stock}
-                onChange={(e) => setStock(parseInt(e.target.value))}
-                placeholder="Ingrese el stock del producto"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
+              <select
+                name=""
+                id=""
+                className="border w-full rounded-md py-2"
+                onChange={(e) => setProductIs(e.target.value)}
+              >
+                <option value="old">Antiguo</option>
+                <option value="new">Nuevo</option>
+              </select>
             </div>
+
+            {ProductIs === "old" ? (
+              <div>
+                <label
+                  htmlFor="stock"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Stock
+                </label>
+                <input
+                  id="stock"
+                  type="number"
+                  value={stock}
+                  onChange={(e) => setStock(parseInt(e.target.value))}
+                  placeholder="Ingrese el stock del producto"
+                  required={ProductIs == "old"}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                />
+              </div>
+            ) : null}
             <button
               type="submit"
               className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary-dark transition duration-300"

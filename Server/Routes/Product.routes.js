@@ -55,23 +55,27 @@ pRouter.post("/delete", async (req, res) => {
 pRouter.post("/update", async (req, res) => {
   const { productos } = req.body;
 
-  console.log(productos);
+  const productAddForTicket = productos.filter(
+    (e) => e.GenerateTicked === true
+  );
 
-  const FileName = "registro.json";
-  const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
+  if (productAddForTicket.length > 0) {
+    const FileName = "registro.json";
+    const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
 
-  // Uso de promesa para escribir el archivo
+    // Uso de promesa para escribir el archivo
 
-  fs.writeFileSync(rutaDirectorio, JSON.stringify(productos))
+    fs.writeFileSync(rutaDirectorio, JSON.stringify(productAddForTicket));
 
-  try {
-    exec("bartend", (err, data) => {
-      console.log(err);
-      console.log(data.toString());
-    });
-    console.log("ejecutado");
-  } catch (error) {
-    console.log("no ejecutado");
+    try {
+      exec("bartend", (err, data) => {
+        console.log(err);
+        console.log(data.toString());
+      });
+      console.log("ejecutado");
+    } catch (error) {
+      console.log("no ejecutado");
+    }
   }
 
   //Find by code if product exist

@@ -20,7 +20,7 @@ export default function SeeSells() {
      }else rej()
     })
 
-    data.then(data => setFacturas(data.data.invoices))
+    data.then(data => setFacturas(data.data.invoices)).catch((err) => console.log("Recuerda que: " + err.response.data.message));
   }, [filtro])
   
 

@@ -2,14 +2,14 @@ import { useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import { GetProductAPI } from "../../Controllers/Product.controller";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 export default function CreateInvoice() {
   const [nombreCliente, setNombreCliente] = useState("");
   const [identificacionCliente, setIdentificacionCliente] = useState("");
   const [nombreVendedor, setNombreVendedor] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const date = new Date();
-  const formattedDate = format(date, 'yyyy-MM-dd');
+  const formattedDate = format(date, "yyyy-MM-dd");
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
   const [precio, setPrecio] = useState(0);
@@ -20,14 +20,16 @@ export default function CreateInvoice() {
   const [editandoId, setEditandoId] = useState(null);
   const [DBProducts, setDBProducts] = useState(null);
   const [fullInvoice, setfullInvoice] = useState(null);
-  const [idIndividualProduct, setidIndividualProduct] = useState(null)
-  const [individualMaxProduct, setindividualMaxProduct] = useState(0)
+  const [idIndividualProduct, setidIndividualProduct] = useState(null);
+  const [individualMaxProduct, setindividualMaxProduct] = useState(0);
   useEffect(() => {
     const data = new Promise((res, rej) => {
       const data = GetProductAPI();
       data ? res(data) : rej({ message: "Error" });
     });
-    data.then((data) => setDBProducts(data.data));
+    data
+      .then((data) => setDBProducts(data.data))
+      .catch((err) => console.log("Recuerda que: " + err.response.data.message));
   }, [productos]);
 
   const agregarProducto = (e) => {
@@ -80,8 +82,8 @@ export default function CreateInvoice() {
     setDescuento(0);
     setCantidad(1);
     setisFilterBycode(false);
-    setidIndividualProduct(null)
-    setindividualMaxProduct(100)
+    setidIndividualProduct(null);
+    setindividualMaxProduct(100);
   };
 
   const editarProducto = (id) => {
@@ -121,7 +123,7 @@ export default function CreateInvoice() {
         total: calcularTotal(),
         totalMoney: 0,
         date: formattedDate,
-        paymentMethod: null
+        paymentMethod: null,
       });
 
       onOpen();
@@ -213,8 +215,8 @@ export default function CreateInvoice() {
                     setNombreProducto(filterProduct[0].name);
                     setPrecio(filterProduct[0].priceSell);
                     setisFilterBycode(true);
-                    setidIndividualProduct(filterProduct[0]._id)
-                    setindividualMaxProduct(filterProduct[0].stock)
+                    setidIndividualProduct(filterProduct[0]._id);
+                    setindividualMaxProduct(filterProduct[0].stock);
                   } else {
                     setisFilterBycode(false);
                   }
