@@ -40,29 +40,29 @@ export default function SeeSells() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 font-bold">
       <Input type='date' label="Filtrar por fecha"
         value={filtro}
         onChange={(e) => setFiltro(e.target.value)}
         className="mb-4 w-52"/>
       <Table aria-label="Tabla de Facturas" className='h-96'>
         <TableHeader>
-          <TableColumn>ID</TableColumn>
-          <TableColumn>FECHA</TableColumn>
-          <TableColumn>VENDEDOR</TableColumn>
-          <TableColumn>TOTAL</TableColumn>
-          <TableColumn>MÉTODO DE PAGO</TableColumn>
-          <TableColumn>ACCIONES</TableColumn>
+          <TableColumn className='font-bold'>ID</TableColumn>
+          <TableColumn className='font-bold'>FECHA</TableColumn>
+          <TableColumn className='font-bold'>VENDEDOR</TableColumn>
+          <TableColumn className='font-bold'>TOTAL</TableColumn>
+          <TableColumn className='font-bold'>MÉTODO DE PAGO</TableColumn>
+          <TableColumn className='font-bold'>ACCIONES</TableColumn>
         </TableHeader>
-        <TableBody >
+        <TableBody className='font-bold' >
           {facturas.map((factura) => (
             <TableRow key={factura._id}>
-              <TableCell className="border border-blue-500  ">{factura._id}</TableCell>
-              <TableCell className="border border-blue-500  ">{factura.date}</TableCell>
-              <TableCell className="border border-blue-500  ">{factura.sellerName}</TableCell>
-              <TableCell className="border border-blue-500  ">${factura.totalInvoice.toLocaleString("es-CO")}</TableCell>
-              <TableCell className="border border-blue-500  ">{factura.payMethod}</TableCell>
-              <TableCell >
+              <TableCell className="border border-blue-500 font-bold  ">{factura._id}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{factura.date}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{factura.sellerName}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">${factura.totalInvoice.toLocaleString("es-CO")}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{factura.payMethod}</TableCell>
+              <TableCell className="border border-blue-500 font-bold " >
                 <Button color="danger" auto className='mx-2' onClick={() => eliminarFactura(factura._id)}>
                   Anular
                 </Button>

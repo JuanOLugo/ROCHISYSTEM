@@ -94,13 +94,13 @@ export default function ListProduct() {
         }}
       >
         <TableHeader>
-          <TableColumn>Código</TableColumn>
-          <TableColumn>Nombre</TableColumn>
+          <TableColumn className=" font-bold ">Código</TableColumn>
+          <TableColumn className=" font-bold ">Nombre</TableColumn>
           <TableColumn
             onClick={toggleSortOrder}
-            className="cursor-pointer flex items-center "
+            className="cursor-pointer flex items-center font-bold "
           >
-            <h1 className="flex">Precio Costo{" "} <label htmlFor="">{sortOrder === "asc" ? (
+            <h1 className="flex ">Precio Costo{" "} <label htmlFor="">{sortOrder === "asc" ? (
               <FaLongArrowAltDown className="mx-1 " />
             ) : (
               <FaLongArrowAltUp className="mx-1 " />
@@ -108,7 +108,7 @@ export default function ListProduct() {
           </TableColumn>
           <TableColumn
             onClick={toggleSortOrder}
-            className="cursor-pointer "
+            className="cursor-pointer font-bold "
           >
             <h1 className="flex">Precio Venta{" "} <label htmlFor="">{sortOrder === "asc" ? (
               <FaLongArrowAltDown className="mx-1 " />
@@ -117,20 +117,20 @@ export default function ListProduct() {
             )}</label></h1>
             
           </TableColumn>
-          <TableColumn>Proveedor</TableColumn>
-          <TableColumn>Stock</TableColumn>
-          <TableColumn>Acciones</TableColumn>
+          <TableColumn className=" font-bold ">Proveedor</TableColumn>
+          <TableColumn className=" font-bold ">Stock</TableColumn>
+          <TableColumn className=" font-bold ">Acciones</TableColumn>
         </TableHeader>
         <TableBody className="border rounded-lg">
           {filteredProducts.map((product) => (
             <TableRow key={product._id} className="">
-              <TableCell className="border border-blue-500  ">{product.code}</TableCell>
-              <TableCell className="border border-blue-500  ">{product.name}</TableCell>
-              <TableCell className="border border-blue-500  ">${product.priceCost.toLocaleString("es-co")}</TableCell>
-              <TableCell className="border border-blue-500  ">${product.priceSell.toLocaleString("es-co")}</TableCell>
-              <TableCell className="border border-blue-500  ">{product.supplier}</TableCell>
-              <TableCell className="border border-blue-500  ">{product.stock}</TableCell>
-              <TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{product.code}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{product.name}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">${product.priceCost.toLocaleString("es-co")}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">${product.priceSell.toLocaleString("es-co")}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{product.supplier}</TableCell>
+              <TableCell className="border border-blue-500 font-bold ">{product.stock}</TableCell>
+              <TableCell className="border border-blue-500 font-bold " >
                 <Button
                   color="error"
                   auto

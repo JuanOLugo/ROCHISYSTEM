@@ -20,7 +20,6 @@ export default function CreateProduct() {
       setCodigo(codeGen())
     } else {
       const AllProductCodes = Products.map((e) => e.code);
-      console.log(AllProductCodes);
       let newNumber;
       do {
         newNumber = codeGen();
@@ -78,7 +77,7 @@ export default function CreateProduct() {
           <h2 className="text-2xl font-bold mb-4 text-primary">
             Crear Producto
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 ">
             <div>
               <label
                 htmlFor="codigo"
@@ -94,7 +93,7 @@ export default function CreateProduct() {
                 onChange={(e) => setCodigo(e.target.value)}
                 placeholder="Ingrese el código del producto"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -111,7 +110,7 @@ export default function CreateProduct() {
                 onChange={(e) => setNombre(e.target.value)}
                 placeholder="Ingrese el nombre del producto"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -128,7 +127,7 @@ export default function CreateProduct() {
                 onChange={(e) => setPrecioCosto(e.target.value)}
                 placeholder="Ingrese el precio del producto"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -146,7 +145,7 @@ export default function CreateProduct() {
                 onChange={(e) => setPrecioventa(e.target.value)}
                 placeholder="Ingrese el precio del producto"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -163,7 +162,7 @@ export default function CreateProduct() {
                 value={proveedor}
                 onChange={(e) => setProveedor(e.target.value)}
                 placeholder="Ingrese el proveedor del producto"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -177,7 +176,7 @@ export default function CreateProduct() {
               <select
                 name=""
                 id=""
-                className="border w-full rounded-md py-2"
+                className="border border-black w-full rounded-md py-2"
                 onChange={(e) => setProductIs(e.target.value)}
               >
                 <option value="old">Antiguo</option>
@@ -200,7 +199,7 @@ export default function CreateProduct() {
                   onChange={(e) => setStock(parseInt(e.target.value))}
                   placeholder="Ingrese el stock del producto"
                   required={ProductIs == "old"}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 />
               </div>
             ) : null}

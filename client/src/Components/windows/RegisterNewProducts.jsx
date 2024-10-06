@@ -129,7 +129,7 @@ export default function RegisterNewProducts() {
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Código
               </label>
@@ -153,13 +153,13 @@ export default function RegisterNewProducts() {
                   }
                 }}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Nombre del Producto
               </label>
@@ -170,13 +170,13 @@ export default function RegisterNewProducts() {
                 value={nombreProducto}
                 onChange={(e) => setNombreProducto(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="costPrice"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Precio de costo
               </label>
@@ -186,13 +186,13 @@ export default function RegisterNewProducts() {
                 value={precioCosto}
                 onChange={(e) => setprecioCosto(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="sellPrice"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Precio de venta
               </label>
@@ -201,13 +201,13 @@ export default function RegisterNewProducts() {
                 type="number"
                 value={precioVenta}
                 onChange={(e) => setprecioVenta(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Cantidad
               </label>
@@ -217,13 +217,13 @@ export default function RegisterNewProducts() {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div className=" flex  ">
               <label
                 htmlFor="costPrice"
-                className="block mr-5 text-sm font-medium text-gray-700 mb-1"
+                className="block mr-5 text-sm font-bold text-gray-700 mb-1"
               >
                 Generar Ticket
               </label>
@@ -256,25 +256,25 @@ export default function RegisterNewProducts() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border  border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Código
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Precio Costo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Precio Venta
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Cantidad
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Ticket
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 border border-black py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -282,25 +282,25 @@ export default function RegisterNewProducts() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {productos.map((producto, i) => (
                   <tr key={i}>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       {producto.codigo}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       {producto.nombre}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       ${producto.precioCosto.toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       ${producto.precioVenta.toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       {producto.cantidad}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 border font-bold border-black whitespace-nowrap">
                       {producto.GenerateTicked ? "Si" : "No"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 border border-black whitespace-nowrap text-sm font-bold">
                       <button
                         onClick={() => editarProducto(producto.id)}
                         className="text-indigo-600 hover:text-indigo-900 mr-2"

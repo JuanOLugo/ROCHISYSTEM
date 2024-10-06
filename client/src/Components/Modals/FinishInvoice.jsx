@@ -30,6 +30,7 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
       data.totalMoney = parseInt(ClientMoney);
       data.paymentMethod = PayMethod;
       setClientMoney(0)
+      setPayMethod("Efectivo")
       const response = await CreateInvoiceAPI({ invoice: data });
       setProductos([]);
       onclose()
@@ -45,21 +46,30 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
               <ModalHeader className="flex flex-col gap-1">
                 Finalizar factura
               </ModalHeader>
-              <ModalBody>
+              <ModalBody className="font-bold">
                 <h1 className="text-2xl font-bold">
                   Total: ${data.total.toLocaleString("es-CO")}
                 </h1>
                 <Input
                   ref={ref}
-                  onChange={(e) => setClientMoney(e.target.value)}
+                  onChange={(e) => {
+                    if(e.target.value === ""){
+                      setClientMoney(0)
+                    }else{
+                      setClientMoney(e.target.value)
+                    }
+                  }}
                   type="number"
                   min={0}
                   label="Total cliente"
                   placeholder="Cantidad dada por el cliente"
+                  color="primary"
+                  size="lg"
+                  className="font-bold "
                 />
                 <h1
-                  className={`text-xl font-bold ${
-                    calculateChange() <= -1 ? "text-red-500" : "text-green-500"
+                  className={`text-xl font-bold py-2 px-1 border border-black rounded-xl ${
+                    calculateChange() <= -1 ? "text-white bg-red-500" : "text-white bg-green-500"
                   }`}
                 >
                   Devuelta: ${calculateChange().toLocaleString("es-co")}
@@ -68,13 +78,18 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
                   name=""
                   id=""
                   onChange={(e) => setPayMethod(e.target.value)}
+                  className="border border-black py-2 px-1 rounded-md"
                 >
                   <option value="Efectivo">Efectivo</option>
                   <option value="Nequi">Nequi</option>
                 </select>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button color="danger" variant="light" onPress={() => {
+                  setClientMoney(0)
+                  setPayMethod("Efectivo")
+                  onClose()
+                }}>
                   Cerrar
                 </Button>
 

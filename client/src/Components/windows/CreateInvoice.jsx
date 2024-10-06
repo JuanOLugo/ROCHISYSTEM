@@ -4,9 +4,9 @@ import FinishInvoice from "../Modals/FinishInvoice";
 import { GetProductAPI } from "../../Controllers/Product.controller";
 import { format } from "date-fns";
 export default function CreateInvoice() {
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [identificacionCliente, setIdentificacionCliente] = useState("");
-  const [nombreVendedor, setNombreVendedor] = useState("");
+  // const [nombreCliente, setNombreCliente] = useState("");
+  //const [identificacionCliente, setIdentificacionCliente] = useState("");
+  //const [nombreVendedor, setNombreVendedor] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const date = new Date();
   const formattedDate = format(date, "yyyy-MM-dd");
@@ -29,15 +29,24 @@ export default function CreateInvoice() {
     });
     data
       .then((data) => setDBProducts(data.data))
-      .catch((err) => console.log("Recuerda que: " + err.response.data.message));
-  }, [productos]);
+      .catch((err) =>
+        console.log("Recuerda que: " + err.response.data.message)
+      );
+  }, []);
 
   const agregarProducto = (e) => {
     e.preventDefault();
     if (editandoId !== null) {
+      const affectPDB = DBProducts.filter((a) => {
+        if (a._id === editandoId) {
+          a.stock = a.stock - cantidad;
+        }
+        return a;
+      });
+      setDBProducts(affectPDB);
       setProductos(
         productos.map((p) =>
-          p.id === editandoId
+          p._id === editandoId
             ? {
                 ...p,
                 codigo,
@@ -51,6 +60,7 @@ export default function CreateInvoice() {
       );
       setEditandoId(null);
       setisFilterBycode(false);
+      setindividualMaxProduct(0);
     } else {
       const ff = productos.filter((e) => e.codigo == codigo);
       if (ff.length > 0) {
@@ -62,7 +72,22 @@ export default function CreateInvoice() {
         }, null);
 
         ff[0].cantidad = findIfProductExistIn;
+
+        const affectPDB = DBProducts.filter((a) => {
+          if (a._id === idIndividualProduct) {
+            a.stock = a.stock - cantidad;
+          }
+          return a;
+        });
+        setDBProducts(affectPDB);
       } else {
+        const affectPDB = DBProducts.filter((a) => {
+          if (a._id === idIndividualProduct) {
+            a.stock = a.stock - cantidad;
+          }
+          return a;
+        });
+        setDBProducts(affectPDB);
         setProductos([
           ...productos,
           {
@@ -76,6 +101,7 @@ export default function CreateInvoice() {
         ]);
       }
     }
+
     setCodigo("");
     setNombreProducto("");
     setPrecio(0);
@@ -87,7 +113,7 @@ export default function CreateInvoice() {
   };
 
   const editarProducto = (id) => {
-    const producto = productos.find((p) => p.id === id);
+    const producto = productos.find((p) => p._id === id);
     setisFilterBycode(true);
     if (producto) {
       setCodigo(producto.codigo);
@@ -95,12 +121,37 @@ export default function CreateInvoice() {
       setPrecio(producto.precio);
       setDescuento(producto.descuento);
       setCantidad(producto.cantidad);
+
+      const affectPDB = DBProducts.filter((a) => {
+        if (a._id === id) {
+          a.stock = a.stock + producto.cantidad;
+        }
+        return a;
+      });
+
+      setindividualMaxProduct(
+        affectPDB.filter((e) => {
+          if (e._id == id) {
+            return e.stock;
+          }
+        })[0].stock
+      );
+      setDBProducts(affectPDB);
       setEditandoId(id);
     }
   };
 
-  const eliminarProducto = (id) => {
-    setProductos(productos.filter((p) => p.id !== id));
+  const eliminarProducto = (id, stock) => {
+    const renewStock = DBProducts.filter((p) => {
+      if (p._id === id) {
+        p.stock = p.stock + stock;
+      }
+
+      return p;
+    });
+    console.log(renewStock);
+    setDBProducts(renewStock);
+    setProductos(productos.filter((p) => p._id !== id));
   };
 
   const calcularTotal = () => {
@@ -116,9 +167,9 @@ export default function CreateInvoice() {
     // Aquí iría la lógica para guardar la factura
     if (productos.length > 0) {
       setfullInvoice({
-        nombreCliente,
-        identificacionCliente,
-        nombreVendedor,
+        //nombreCliente,
+        //identificacionCliente,
+        // nombreVendedor,
         productos,
         total: calcularTotal(),
         totalMoney: 0,
@@ -133,7 +184,7 @@ export default function CreateInvoice() {
   return (
     <div className="container mx-auto my-5">
       <div className="space-y-6">
-        <div className="bg-white shadow-lg rounded-lg p-6">
+        {/*<div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4 text-primary">
             Información del Cliente y Vendedor
           </h2>
@@ -141,7 +192,7 @@ export default function CreateInvoice() {
             <div>
               <label
                 htmlFor="nombreCliente"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Nombre del Cliente (Opcional)
               </label>
@@ -150,13 +201,13 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreCliente}
                 onChange={(e) => setNombreCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="identificacionCliente"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Identificación del Cliente (Opcional)
               </label>
@@ -165,13 +216,13 @@ export default function CreateInvoice() {
                 type="text"
                 value={identificacionCliente}
                 onChange={(e) => setIdentificacionCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreVendedor"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Nombre del Vendedor (Opcional)
               </label>
@@ -180,16 +231,13 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreVendedor}
                 onChange={(e) => setNombreVendedor(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
           </div>
-        </div>
+        </div>*/}
 
         <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
-            Agregar Producto
-          </h2>
           <form
             onSubmit={agregarProducto}
             className="grid grid-cols-1 md:grid-cols-5 gap-4"
@@ -197,7 +245,7 @@ export default function CreateInvoice() {
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Código
               </label>
@@ -222,13 +270,13 @@ export default function CreateInvoice() {
                   }
                 }}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Nombre del Producto
               </label>
@@ -239,13 +287,13 @@ export default function CreateInvoice() {
                 value={nombreProducto}
                 onChange={(e) => setNombreProducto(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="precio"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Precio
               </label>
@@ -257,13 +305,13 @@ export default function CreateInvoice() {
                 min="0"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="descuento"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Descuento (%)
               </label>
@@ -274,13 +322,13 @@ export default function CreateInvoice() {
                 onChange={(e) => setDescuento(e.target.value)}
                 min="0"
                 max="100"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-bold text-gray-700 mb-1"
               >
                 Cantidad
               </label>
@@ -292,7 +340,7 @@ export default function CreateInvoice() {
                 min="1"
                 max={individualMaxProduct}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div className="md:col-span-5">
@@ -316,48 +364,48 @@ export default function CreateInvoice() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Código
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Precio
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Descuento
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Cantidad
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {productos.map((producto) => (
-                  <tr key={producto.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                  <tr key={producto.id} className="border-b-1 border-black">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       {producto.codigo}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       {producto.nombre}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       ${producto.precio.toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       {producto.descuento}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       {producto.cantidad}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black ">
                       $
                       {(
                         producto.precio *
@@ -365,15 +413,17 @@ export default function CreateInvoice() {
                         (1 - producto.descuento / 100)
                       ).toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap border  border-black text-sm font-bold">
                       <button
-                        onClick={() => editarProducto(producto.id)}
+                        onClick={() => editarProducto(producto._id)}
                         className="text-indigo-600 hover:text-indigo-900 mr-2"
                       >
                         Editar
                       </button>
                       <button
-                        onClick={() => eliminarProducto(producto.id)}
+                        onClick={() =>
+                          eliminarProducto(producto._id, producto.cantidad)
+                        }
                         className="text-red-600 hover:text-red-900"
                       >
                         Eliminar
