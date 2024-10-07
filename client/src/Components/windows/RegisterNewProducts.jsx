@@ -11,11 +11,11 @@ export default function RegisterNewProducts() {
   const [identificacionCliente, setIdentificacionCliente] = useState("");
   const [nombreVendedor, setNombreVendedor] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
+  const [productFilterByName, setproductFilterByName] = useState([])
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
-  const [precioCosto, setprecioCosto] = useState(null);
-  const [precioVenta, setprecioVenta] = useState(null);
+  const [precioCosto, setprecioCosto] = useState("");
+  const [precioVenta, setprecioVenta] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [isFilterBycode, setisFilterBycode] = useState(false);
   const [productos, setProductos] = useState([]);
@@ -23,7 +23,7 @@ export default function RegisterNewProducts() {
   const [DBProducts, setDBProducts] = useState(null);
   const [fullRegister, setFullRegister] = useState(null);
   const [GenerateTicked, setGenerateTicked] = useState(true);
-
+  const [productExist, setproductExist] = useState(false)
 
   useEffect(() => {
     const data = new Promise((res, rej) => {
@@ -37,47 +37,58 @@ export default function RegisterNewProducts() {
       );
   }, []);
 
+  useEffect(() => {
+    if (codigo) {
+      const verify = DBProducts.filter((p) => p.code === codigo);
+      if (verify.length > 0) {
+        setproductExist(true);
+      } else setproductExist(false);
+    }
+  }, [codigo]);
+
   const agregarProducto = (e) => {
     e.preventDefault();
-    if (editandoId !== null) {
-      setProductos(
-        productos.map((p) =>
-          p.id === editandoId
-            ? {
-                ...p,
-                codigo,
-                nombre: nombreProducto,
-                precioCosto,
-                precioVenta,
-                cantidad,
-                GenerateTicked,
-              }
-            : p
-        )
-      );
-      setEditandoId(null);
+    if(productExist){
+      if (editandoId !== null) {
+        setProductos(
+          productos.map((p) =>
+            p.id === editandoId
+              ? {
+                  ...p,
+                  codigo,
+                  nombre: nombreProducto,
+                  precioCosto,
+                  precioVenta,
+                  cantidad,
+                  GenerateTicked,
+                }
+              : p
+          )
+        );
+        setEditandoId(null);
+        setisFilterBycode(false);
+      } else {
+        setProductos([
+          ...productos,
+          {
+            id: Date.now(),
+            codigo,
+            nombre: nombreProducto,
+            precioCosto,
+            precioVenta,
+            cantidad,
+            GenerateTicked,
+          },
+        ]);
+      }
+      setCodigo("");
+      setNombreProducto("");
+      setprecioCosto("");
+      setprecioVenta("");
+      setCantidad("");
       setisFilterBycode(false);
-    } else {
-      setProductos([
-        ...productos,
-        {
-          id: Date.now(),
-          codigo,
-          nombre: nombreProducto,
-          precioCosto,
-          precioVenta,
-          cantidad,
-          GenerateTicked,
-        },
-      ]);
-    }
-    setCodigo("");
-    setNombreProducto("");
-    setprecioCosto("");
-    setprecioVenta("");
-    setCantidad("");
-    setisFilterBycode(false);
-    setGenerateTicked(true);
+      setGenerateTicked(true);
+    }else alert("El producto que intenta agregar no existe")
   };
 
   const editarProducto = (id) => {
@@ -168,10 +179,48 @@ export default function RegisterNewProducts() {
                 id="nombreProducto"
                 type="text"
                 value={nombreProducto}
-                onChange={(e) => setNombreProducto(e.target.value)}
+                onChange={(e) => {
+                  setNombreProducto(e.target.value)
+                  const productFilter = DBProducts.filter(p => p.name.toLowerCase().includes(e.target.value))
+                  if(e.target.value.length > 0){
+                    setproductFilterByName(productFilter)
+                  }else{
+                    setproductFilterByName([])
+                  }
+                }}
                 required
                 className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
+
+              <div
+                className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${
+                  productFilterByName.length == 0 ? "hidden" : "block"
+                }`}
+              >
+                {productFilterByName.length > 0
+                  ? productFilterByName.map((e, i) => {
+                      return (
+                        <div
+                          key={i}
+                          className="hover:bg-white w-full pl-1 cursor-pointer hover:text-blue-500 transition-all"
+                        >
+                          <button
+                            className="w-full text-start"
+                            onClick={() => {
+                              setCodigo(e.code);
+                              setNombreProducto(e.name);
+                              setprecioCosto(e.priceCost);
+                              setprecioVenta(e.priceSell);
+                              setproductFilterByName([]);
+                            }}
+                          >
+                            {e.name} -{" "}
+                          </button>
+                        </div>
+                      );
+                    })
+                  : null}
+              </div>
             </div>
             <div>
               <label

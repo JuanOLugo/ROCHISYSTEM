@@ -22,6 +22,9 @@ export default function CreateInvoice() {
   const [fullInvoice, setfullInvoice] = useState(null);
   const [idIndividualProduct, setidIndividualProduct] = useState(null);
   const [individualMaxProduct, setindividualMaxProduct] = useState(0);
+  const [productExist, setproductExist] = useState(false);
+  const [productFilterByName, setproductFilterByName] = useState([])
+
   useEffect(() => {
     const data = new Promise((res, rej) => {
       const data = GetProductAPI();
@@ -34,82 +37,93 @@ export default function CreateInvoice() {
       );
   }, []);
 
+  useEffect(() => {
+    if (codigo) {
+      const verify = DBProducts.filter((p) => p.code === codigo);
+      if (verify.length > 0) {
+        setproductExist(true);
+      } else setproductExist(false);
+    }
+  }, [codigo]);
+
   const agregarProducto = (e) => {
     e.preventDefault();
-    if (editandoId !== null) {
-      const affectPDB = DBProducts.filter((a) => {
-        if (a._id === editandoId) {
-          a.stock = a.stock - cantidad;
-        }
-        return a;
-      });
-      setDBProducts(affectPDB);
-      setProductos(
-        productos.map((p) =>
-          p._id === editandoId
-            ? {
-                ...p,
-                codigo,
-                nombre: nombreProducto,
-                precio,
-                descuento,
-                cantidad,
-              }
-            : p
-        )
-      );
-      setEditandoId(null);
-      setisFilterBycode(false);
-      setindividualMaxProduct(0);
-    } else {
-      const ff = productos.filter((e) => e.codigo == codigo);
-      if (ff.length > 0) {
-        const findIfProductExistIn = ff.reduce((acumulador, producto) => {
-          if (producto.codigo === codigo) {
-            return producto.cantidad + cantidad;
-          }
-          return acumulador;
-        }, null);
-
-        ff[0].cantidad = findIfProductExistIn;
-
+    if (productExist) {
+      if (editandoId !== null) {
         const affectPDB = DBProducts.filter((a) => {
-          if (a._id === idIndividualProduct) {
+          if (a._id === editandoId) {
             a.stock = a.stock - cantidad;
           }
           return a;
         });
         setDBProducts(affectPDB);
+        setProductos(
+          productos.map((p) =>
+            p._id === editandoId
+              ? {
+                  ...p,
+                  codigo,
+                  nombre: nombreProducto,
+                  precio,
+                  descuento,
+                  cantidad,
+                }
+              : p
+          )
+        );
+        setEditandoId(null);
+        setisFilterBycode(false);
+        setindividualMaxProduct(0);
       } else {
-        const affectPDB = DBProducts.filter((a) => {
-          if (a._id === idIndividualProduct) {
-            a.stock = a.stock - cantidad;
-          }
-          return a;
-        });
-        setDBProducts(affectPDB);
-        setProductos([
-          ...productos,
-          {
-            _id: idIndividualProduct,
-            codigo,
-            nombre: nombreProducto,
-            precio,
-            descuento,
-            cantidad,
-          },
-        ]);
-      }
-    }
+        const ff = productos.filter((e) => e.codigo == codigo);
+        if (ff.length > 0) {
+          const findIfProductExistIn = ff.reduce((acumulador, producto) => {
+            if (producto.codigo === codigo) {
+              return producto.cantidad + cantidad;
+            }
+            return acumulador;
+          }, null);
 
-    setCodigo("");
-    setNombreProducto("");
-    setPrecio(0);
-    setDescuento(0);
-    setCantidad(1);
-    setisFilterBycode(false);
-    setidIndividualProduct(null);
-    setindividualMaxProduct(100);
+          ff[0].cantidad = findIfProductExistIn;
+
+          const affectPDB = DBProducts.filter((a) => {
+            if (a._id === idIndividualProduct) {
+              a.stock = a.stock - cantidad;
+            }
+            return a;
+          });
+          setDBProducts(affectPDB);
+        } else {
+          const affectPDB = DBProducts.filter((a) => {
+            if (a._id === idIndividualProduct) {
+              a.stock = a.stock - cantidad;
+            }
+            return a;
+          });
+          setDBProducts(affectPDB);
+          setProductos([
+            ...productos,
+            {
+              _id: idIndividualProduct,
+              codigo,
+              nombre: nombreProducto,
+              precio,
+              descuento,
+              cantidad,
+            },
+          ]);
+        }
+      }
+
+      setCodigo("");
+      setNombreProducto("");
+      setPrecio(0);
+      setDescuento(0);
+      setCantidad(1);
+      setisFilterBycode(false);
+      setidIndividualProduct(null);
+      setindividualMaxProduct(100);
+    } else alert("El producto que intentas agregar no existe");
   };
 
   const editarProducto = (id) => {
@@ -149,7 +163,6 @@ export default function CreateInvoice() {
 
       return p;
     });
-    console.log(renewStock);
     setDBProducts(renewStock);
     setProductos(productos.filter((p) => p._id !== id));
   };
@@ -285,10 +298,36 @@ export default function CreateInvoice() {
                 id="nombreProducto"
                 type="text"
                 value={nombreProducto}
-                onChange={(e) => setNombreProducto(e.target.value)}
+                onChange={(e) => {
+                  setNombreProducto(e.target.value)
+                  const productFilter = DBProducts.filter(p => p.name.toLowerCase().includes(e.target.value))
+                  if(e.target.value.length > 0){
+                    setproductFilterByName(productFilter)
+                  }else{
+                    setproductFilterByName([])
+                  }
+                }}
                 required
                 className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
+              <div className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${productFilterByName.length == 0 ? "hidden" : "block"}`}>
+                {
+                  productFilterByName.length > 0 ? productFilterByName.map((e, i) => {
+                    return(
+                      <div key={i} className="hover:bg-white w-full pl-1 cursor-pointer hover:text-blue-500 transition-all">
+                        <button className="w-full text-start"  onClick={() => {
+                          setCodigo(e.code)
+                          setNombreProducto(e.name)
+                          setPrecio(e.priceSell)
+                          setproductFilterByName([])
+                          setidIndividualProduct(e._id)
+                          setindividualMaxProduct(e.stock);
+                        }} >{e.name} - </button>
+                      </div>
+                    )
+                  }) : null
+                }
+              </div>
             </div>
             <div>
               <label
@@ -389,7 +428,7 @@ export default function CreateInvoice() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {productos.map((producto) => (
-                  <tr key={producto.id} className="border-b-1 border-black">
+                  <tr key={producto._id} className="border-b-1 border-black">
                     <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
                       {producto.codigo}
                     </td>

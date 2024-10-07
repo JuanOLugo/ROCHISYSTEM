@@ -61,7 +61,7 @@ export default function Navbar() {
           </div>
           <div className="hidden md:flex items-center space-x-1">
             {opcionesMenu.map((opcion, index) => (
-              <div>
+              <div key={index}>
                 {
                 opcion.href ? <a href={opcion.href}  className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300" target="_blank">{opcion.texto}</a> : <button
                 key={index}
