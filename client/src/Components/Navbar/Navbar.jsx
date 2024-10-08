@@ -39,7 +39,7 @@ export default function Navbar() {
       action: "see_sells",
     },
     {
-      texto: "Registrar inventario",
+      texto: "Ingresar inventario",
       action: "see_product_sells",
     },
     {

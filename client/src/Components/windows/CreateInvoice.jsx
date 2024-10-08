@@ -1,5 +1,5 @@
 import { useDisclosure } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import { GetProductAPI } from "../../Controllers/Product.controller";
 import { format } from "date-fns";
@@ -24,6 +24,15 @@ export default function CreateInvoice() {
   const [individualMaxProduct, setindividualMaxProduct] = useState(0);
   const [productExist, setproductExist] = useState(false);
   const [productFilterByName, setproductFilterByName] = useState([])
+
+  const ref = useRef()
+
+  useEffect(() => {
+    if(productos.length > 9){
+      ref.current.scrollTop = ref.current.scrollHeight
+    }
+  }, [productos])
+  
 
   useEffect(() => {
     const data = new Promise((res, rej) => {
@@ -196,7 +205,7 @@ export default function CreateInvoice() {
 
   return (
     <div className="container mx-auto my-5">
-      <div className="space-y-6">
+      <div className="space-y-2 ">
         {/*<div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4 text-primary">
             Información del Cliente y Vendedor
@@ -214,7 +223,7 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreCliente}
                 onChange={(e) => setNombreCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -229,7 +238,7 @@ export default function CreateInvoice() {
                 type="text"
                 value={identificacionCliente}
                 onChange={(e) => setIdentificacionCliente(e.target.value)}
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -244,16 +253,16 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreVendedor}
                 onChange={(e) => setNombreVendedor(e.target.value)}
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
           </div>
         </div>*/}
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
+        <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
           <form
             onSubmit={agregarProducto}
-            className="grid grid-cols-1 md:grid-cols-5 gap-4"
+            className="grid grid-cols-1  md:grid-cols-5 gap-4"
           >
             <div>
               <label
@@ -283,7 +292,7 @@ export default function CreateInvoice() {
                   }
                 }}
                 required
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -308,7 +317,7 @@ export default function CreateInvoice() {
                   }
                 }}
                 required
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
               <div className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${productFilterByName.length == 0 ? "hidden" : "block"}`}>
                 {
@@ -322,7 +331,7 @@ export default function CreateInvoice() {
                           setproductFilterByName([])
                           setidIndividualProduct(e._id)
                           setindividualMaxProduct(e.stock);
-                        }} >{e.name} - </button>
+                        }} >{e.name} </button>
                       </div>
                     )
                   }) : null
@@ -344,7 +353,7 @@ export default function CreateInvoice() {
                 min="0"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -361,7 +370,7 @@ export default function CreateInvoice() {
                 onChange={(e) => setDescuento(e.target.value)}
                 min="0"
                 max="100"
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div>
@@ -379,13 +388,13 @@ export default function CreateInvoice() {
                 min="1"
                 max={individualMaxProduct}
                 required
-                className="w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
             <div className="md:col-span-5">
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary-dark transition duration-300"
+                className="w-full bg-primary text-primary-foreground py-1  px-4 rounded-md hover:bg-primary-dark transition duration-300"
               >
                 {editandoId !== null
                   ? "Actualizar Producto"
@@ -395,56 +404,56 @@ export default function CreateInvoice() {
           </form>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
+        <div className="bg-white shadow-lg rounded-lg px-3 py-1">
+          <h2 className="text-xl font-semibold mb-2 text-primary">
             Productos en la Factura
           </h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+          <div className="overflow-x-auto overflow-scroll h-64" ref={ref}>
+            <table className="min-w-full divide-y divide-gray-200 ">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Código
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Precio
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Descuento
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Cantidad
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-200 ">
                 {productos.map((producto) => (
                   <tr key={producto._id} className="border-b-1 border-black">
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       {producto.codigo}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       {producto.nombre}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       ${producto.precio.toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs  font-bold border border-black">
                       {producto.descuento}%
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       {producto.cantidad}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-bold border border-black ">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black ">
                       $
                       {(
                         producto.precio *
@@ -452,10 +461,10 @@ export default function CreateInvoice() {
                         (1 - producto.descuento / 100)
                       ).toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap border  border-black text-sm font-bold">
+                    <td className="px-6 py-1 whitespace-nowrap border text-xs border-black  font-bold">
                       <button
                         onClick={() => editarProducto(producto._id)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-2"
+                        className="text-indigo-600 text-xs hover:text-indigo-900 mr-2"
                       >
                         Editar
                       </button>
@@ -463,7 +472,7 @@ export default function CreateInvoice() {
                         onClick={() =>
                           eliminarProducto(producto._id, producto.cantidad)
                         }
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-600 text-xs  hover:text-red-900"
                       >
                         Eliminar
                       </button>
@@ -473,13 +482,13 @@ export default function CreateInvoice() {
               </tbody>
             </table>
           </div>
-          <div className="mt-6 flex justify-between items-center">
+          <div className="mt-3 flex justify-between items-center">
             <span className="text-xl font-bold">
               Total: ${calcularTotal().toLocaleString("es-co")}
             </span>
             <button
               onClick={finishFactura}
-              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
+              className="bg-green-500 text-white py-1  px-4 rounded-md hover:bg-green-600 transition duration-300"
             >
               Guardar Factura
             </button>
