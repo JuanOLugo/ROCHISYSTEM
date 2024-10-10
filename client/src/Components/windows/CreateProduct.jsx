@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { customAlphabet } from "nanoid";
 import { CreateProductAPI } from "../../Controllers/Product.controller";
 import { GetProductAPI } from "../../Controllers/Product.controller";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 export default function CreateProduct() {
   const codeGen = customAlphabet("123456789", 4);
 
@@ -53,9 +56,26 @@ export default function CreateProduct() {
       proveedor,
       stock: stock == "" ? 0 : stock,
     };
-    try {
-      await CreateProductAPI(dataToSend);
-      //codeGen()
+
+    const response = new Promise(res => res(CreateProductAPI(dataToSend)));
+      toast.promise(
+        response,
+        {
+          pending: "Creando producto",
+          success: "Producto creado 👌",
+          error: "Error al crear producto 🤯",
+        },
+        {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        }
+      );
       setCodigo("");
       setNombre("");
       setPrecioCosto("");
@@ -63,15 +83,28 @@ export default function CreateProduct() {
       setProveedor("");
       setStock("");
 
+    try {
       const data = await GetProductAPI();
       setProducts(data.data);
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error.response.data.message, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        });
     }
   };
 
   return (
     <div className="container mx-auto p-4 ">
+       <ToastContainer containerId={3}
+        
+        />
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-4 text-primary">
@@ -212,7 +245,7 @@ export default function CreateProduct() {
           </form>
         </div>
 
-        <div className="hidden md:block w-64 bg-white shadow-lg rounded-lg p-6">
+        {/* {<div className="hidden md:block w-64 bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-4 text-primary">
             Código de Barras
           </h2>
@@ -229,7 +262,7 @@ export default function CreateProduct() {
               <path d="M12 4v16m8-8H4"></path>
             </svg>
           </div>
-        </div>
+        </div>} */}
       </div>
     </div>
   );

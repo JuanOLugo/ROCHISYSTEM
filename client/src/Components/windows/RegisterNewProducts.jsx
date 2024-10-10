@@ -5,6 +5,9 @@ import {
   GetProductAPI,
   UpdateProductsAPI,
 } from "../../Controllers/Product.controller";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 export default function RegisterNewProducts() {
   const [nombreCliente, setNombreCliente] = useState("");
@@ -96,7 +99,16 @@ export default function RegisterNewProducts() {
       setCantidad("");
       setisFilterBycode(false);
       setGenerateTicked(true);
-    }else alert("El producto que intenta agregar no existe")
+    }else toast.error(`El producto que intenta agregar no existe`, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      });
   };
 
   const editarProducto = (id) => {
@@ -123,19 +135,58 @@ export default function RegisterNewProducts() {
       try {
         const response = await UpdateProductsAPI({ productos });
         if (response.status === 400) {
-          alert("Error con BARTENDER, comuniquese con el desarrollador");
+          toast.warning(`Error con BARTENDER, comuniquese con el desarrollador`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });
         } else {
-          alert("Registrados correctamente");
+          toast.success("Registrados correctamente", {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+            });
           setProductos([]);
         }
       } catch (error) {
-        alert(error);
+        toast.error(error, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          });
       }
-    } else alert("No hay productos que facturar");
+    } else toast.warning("No hay productos que registrar", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      });
   };
 
   return (
     <div className="container mx-auto my-5">
+       <ToastContainer
+         containerId={10}
+        />
       <div className="space-y-2">
         <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
           <h2 className="text-xl font-semibold mb-4 text-primary">

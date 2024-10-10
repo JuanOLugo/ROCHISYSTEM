@@ -3,6 +3,9 @@ import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import { GetProductAPI } from "../../Controllers/Product.controller";
 import { format } from "date-fns";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 export default function CreateInvoice() {
   // const [nombreCliente, setNombreCliente] = useState("");
   //const [identificacionCliente, setIdentificacionCliente] = useState("");
@@ -23,16 +26,15 @@ export default function CreateInvoice() {
   const [idIndividualProduct, setidIndividualProduct] = useState(null);
   const [individualMaxProduct, setindividualMaxProduct] = useState(0);
   const [productExist, setproductExist] = useState(false);
-  const [productFilterByName, setproductFilterByName] = useState([])
-
-  const ref = useRef()
+  const [productFilterByName, setproductFilterByName] = useState([]);
+  const [WaitVerification, setWaitVerification] = useState(false);
+  const ref = useRef();
 
   useEffect(() => {
-    if(productos.length > 9){
-      ref.current.scrollTop = ref.current.scrollHeight
+    if (productos.length > 9) {
+      ref.current.scrollTop = ref.current.scrollHeight;
     }
-  }, [productos])
-  
+  }, [productos]);
 
   useEffect(() => {
     const data = new Promise((res, rej) => {
@@ -53,11 +55,14 @@ export default function CreateInvoice() {
         setproductExist(true);
       } else setproductExist(false);
     }
+
+    setWaitVerification(true);
   }, [codigo]);
 
   const agregarProducto = (e) => {
     e.preventDefault();
-    if (productExist) {
+    const verify = DBProducts.filter((p) => p.code === codigo);
+    if (verify.length > 0) {
       if (editandoId !== null) {
         const affectPDB = DBProducts.filter((a) => {
           if (a._id === editandoId) {
@@ -132,7 +137,17 @@ export default function CreateInvoice() {
       setisFilterBycode(false);
       setidIndividualProduct(null);
       setindividualMaxProduct(100);
-    } else alert("El producto que intentas agregar no existe");
+    } else
+      toast.error(`CODIGO: ${codigo} No existe`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        });
   };
 
   const editarProducto = (id) => {
@@ -200,11 +215,21 @@ export default function CreateInvoice() {
       });
 
       onOpen();
-    } else alert("No hay productos que facturar");
+    } else toast.warning(`No hay productos que facturar`, {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+      });
   };
 
   return (
     <div className="container mx-auto my-5">
+      <ToastContainer containerId={2}/>
       <div className="space-y-2 ">
         {/*<div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-xl font-semibold mb-4 text-primary">
@@ -308,34 +333,48 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  setNombreProducto(e.target.value)
-                  const productFilter = DBProducts.filter(p => p.name.toLowerCase().includes(e.target.value))
-                  if(e.target.value.length > 0){
-                    setproductFilterByName(productFilter)
-                  }else{
-                    setproductFilterByName([])
+                  setNombreProducto(e.target.value);
+                  const productFilter = DBProducts.filter((p) =>
+                    p.name.toLowerCase().includes(e.target.value)
+                  );
+                  if (e.target.value.length > 0) {
+                    setproductFilterByName(productFilter);
+                  } else {
+                    setproductFilterByName([]);
                   }
                 }}
                 required
                 className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
-              <div className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${productFilterByName.length == 0 ? "hidden" : "block"}`}>
-                {
-                  productFilterByName.length > 0 ? productFilterByName.map((e, i) => {
-                    return(
-                      <div key={i} className="hover:bg-white w-full pl-1 cursor-pointer hover:text-blue-500 transition-all">
-                        <button className="w-full text-start"  onClick={() => {
-                          setCodigo(e.code)
-                          setNombreProducto(e.name)
-                          setPrecio(e.priceSell)
-                          setproductFilterByName([])
-                          setidIndividualProduct(e._id)
-                          setindividualMaxProduct(e.stock);
-                        }} >{e.name} </button>
-                      </div>
-                    )
-                  }) : null
-                }
+              <div
+                className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${
+                  productFilterByName.length == 0 ? "hidden" : "block"
+                }`}
+              >
+                {productFilterByName.length > 0
+                  ? productFilterByName.map((e, i) => {
+                      return (
+                        <div
+                          key={i}
+                          className="hover:bg-white w-full pl-1 cursor-pointer hover:text-blue-500 transition-all"
+                        >
+                          <button
+                            className="w-full text-start"
+                            onClick={() => {
+                              setCodigo(e.code);
+                              setNombreProducto(e.name);
+                              setPrecio(e.priceSell);
+                              setproductFilterByName([]);
+                              setidIndividualProduct(e._id);
+                              setindividualMaxProduct(e.stock);
+                            }}
+                          >
+                            {e.name}{" "}
+                          </button>
+                        </div>
+                      );
+                    })
+                  : null}
               </div>
             </div>
             <div>

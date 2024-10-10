@@ -14,6 +14,9 @@ import {
   DeleteProductAPI,
   GetProductAPI,
 } from "../../Controllers/Product.controller";
+import { ToastContainer, toast } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 
 export default function ListProduct() {
@@ -25,11 +28,27 @@ export default function ListProduct() {
   const [productspaginate, setproductspaginate] = useState([]);
   const [pageNum, setpageNum] = useState(1);
   const [pageSize, setpageSize] = useState(10);
+
   useEffect(() => {
-    const data = new Promise((res, rej) => {
-      const data = GetProductAPI();
-      data ? res(data) : rej({ message: "Error" });
-    });
+    const data = new Promise(res => res(GetProductAPI()));
+    toast.promise(
+      data,
+      {
+        pending: "Obteniendo los productos...",
+        success: "Productos obtenidos 👌",
+        error: "Error al obtener los productos 🤯",
+      },
+      {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      }
+    );
     data
       .then((data) => setProducts(data.data))
       .catch((err) =>
@@ -40,9 +59,10 @@ export default function ListProduct() {
   const handleDelete = useCallback(async (id) => {
     DeleteProductAPI({ id });
     setProducts((products) => products.filter((product) => product._id !== id));
-    setproductspaginate((products) => products.filter((product) => product._id !== id));
+    setproductspaginate((products) =>
+      products.filter((product) => product._id !== id)
+    );
   }, []);
-
 
   useEffect(() => {
     if (codeFilter.length > 0 || nameFilter.length > 0) {
@@ -78,6 +98,7 @@ export default function ListProduct() {
 
   return (
     <div className="container mx-auto p-4">
+      <ToastContainer containerId={11} />
       <div className="mb-4 flex flex-wrap gap-4">
         <Input
           clearable
@@ -105,26 +126,27 @@ export default function ListProduct() {
               pageSize === 10
                 ? "bg-gray-500 opacity-50   rounded-md text-white font-bold"
                 : "bg-blue-600   rounded-md text-white font-bold"
-            }`} onClick={() => {
-              if(products.length > 9){
-                setpageSize(10)
-                setpageNum(1)
-                setcodeFilter("")
-                setnameFilter("")
+            }`}
+            onClick={() => {
+              if (products.length > 9) {
+                setpageSize(10);
+                setpageNum(1);
+                setcodeFilter("");
+                setnameFilter("");
               }
             }}
           >
             10
           </button>
           <button
-          onClick={() => {
-            if(products.length > 49){
-              setpageSize(50)
-              setpageNum(1)
-              setcodeFilter("")
-              setnameFilter("")
-            }
-          }}
+            onClick={() => {
+              if (products.length > 49) {
+                setpageSize(50);
+                setpageNum(1);
+                setcodeFilter("");
+                setnameFilter("");
+              }
+            }}
             className={`mx-1 text-sm p-1 ${
               pageSize === 50
                 ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
@@ -134,14 +156,14 @@ export default function ListProduct() {
             50
           </button>
           <button
-          onClick={() => {
-            if(products.length > 50){
-              setpageSize(100)
-              setpageNum(1)
-              setcodeFilter("")
-              setnameFilter("")
-            }
-          }}
+            onClick={() => {
+              if (products.length > 50) {
+                setpageSize(100);
+                setpageNum(1);
+                setcodeFilter("");
+                setnameFilter("");
+              }
+            }}
             className={`mx-1 text-sm p-1 ${
               pageSize === 100
                 ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
@@ -163,19 +185,11 @@ export default function ListProduct() {
         <TableHeader>
           <TableColumn className=" font-bold ">Código</TableColumn>
           <TableColumn className=" font-bold ">Nombre</TableColumn>
-          <TableColumn
-            className=" flex items-center font-bold "
-          >
-            <h1 className="flex ">
-              Precio Costo{" "}
-            </h1>
+          <TableColumn className=" flex items-center font-bold ">
+            <h1 className="flex ">Precio Costo </h1>
           </TableColumn>
-          <TableColumn
-            className=" font-bold "
-          >
-            <h1 className="flex">
-              Precio Venta{" "}
-            </h1>
+          <TableColumn className=" font-bold ">
+            <h1 className="flex">Precio Venta </h1>
           </TableColumn>
           <TableColumn className=" font-bold ">Proveedor</TableColumn>
           <TableColumn className=" font-bold ">Stock</TableColumn>
