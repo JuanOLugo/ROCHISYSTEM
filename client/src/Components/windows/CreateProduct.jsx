@@ -57,54 +57,26 @@ export default function CreateProduct() {
       stock: stock == "" ? 0 : stock,
     };
 
-    const response = new Promise(res => res(CreateProductAPI(dataToSend)));
-      toast.promise(
-        response,
-        {
-          pending: "Creando producto",
-          success: "Producto creado 👌",
-          error: "Error al crear producto 🤯",
-        },
-        {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        }
-      );
+    await CreateProductAPI(dataToSend)
+    .then(async rdata => {
+      const data = await GetProductAPI();
+      setProducts(data.data);
       setCodigo("");
       setNombre("");
       setPrecioCosto("");
       setPrecioventa("");
       setProveedor("");
       setStock("");
-
-    try {
-      const data = await GetProductAPI();
-      setProducts(data.data);
-    } catch (error) {
-      toast.error(error.response.data.message, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-        });
-    }
+    })
+    .catch(err => alert("Producto ya existe"));
+   
   };
 
   return (
     <div className="container mx-auto p-4 ">
-       <ToastContainer containerId={3}
-        
-        />
+      <ToastContainer containerId={8000}
+
+      />
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-4 text-primary">

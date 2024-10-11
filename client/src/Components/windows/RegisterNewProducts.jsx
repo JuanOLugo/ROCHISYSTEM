@@ -234,7 +234,6 @@ export default function RegisterNewProducts() {
                 Nombre del Producto
               </label>
               <input
-                readOnly={isFilterBycode}
                 id="nombreProducto"
                 type="text"
                 value={nombreProducto}

@@ -30,7 +30,6 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
   };
   const [PayMethod, setPayMethod] = useState("Efectivo");
   const GuardarFactura = async (e, onclose) => {
-    e.preventDefault();
     if (ClientMoney > 0) {
       data.totalMoney = parseInt(ClientMoney);
       data.paymentMethod = PayMethod;
@@ -67,12 +66,6 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
         <ModalContent>
           {(onClose) => (
             <>
-              <form
-                action=""
-                onSubmit={(e) => {
-                  GuardarFactura(e, onClose);
-                }}
-              >
                 <ModalHeader className="flex flex-col gap-1">
                   Finalizar factura
                 </ModalHeader>
@@ -127,9 +120,10 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
                     Cerrar
                   </Button>
 
-                  <Button color="primary">Guardar</Button>
+                  <Button onPress={(e) => {
+                  GuardarFactura(e, onClose);
+                }} color="primary">Guardar</Button>
                 </ModalFooter>
-              </form>
             </>
           )}
         </ModalContent>
