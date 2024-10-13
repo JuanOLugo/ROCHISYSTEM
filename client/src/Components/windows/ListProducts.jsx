@@ -66,19 +66,21 @@ export default function ListProduct() {
 
   useEffect(() => {
     if (codeFilter.length > 0 || nameFilter.length > 0) {
-      setproductspaginate(
-        products.filter((product) => {
-          const matchesName = product.code
-            .toLowerCase()
-            .includes(codeFilter.toLowerCase());
-          const matchesnameFilter = product.name
-            .toLowerCase()
-            .includes(nameFilter.toLowerCase());
-          return matchesName && matchesnameFilter;
-        })
+      const productsToPaginate = products.filter((product) => {
+        const matchesName = product.code
+          .toLowerCase()
+          .includes(codeFilter.toLowerCase());
+        const matchesnameFilter = product.name
+          .toLowerCase()
+          .includes(nameFilter.toLowerCase());
+        return matchesName && matchesnameFilter;
+      })
+
+      setproductspaginate(paginacion(productsToPaginate, pageSize, pageNum)
       );
     } else {
-      setproductspaginate(paginacion(products, 10, pageNum));
+      setproductspaginate(paginacion(products, 10, 1));
+      
     }
   }, [codeFilter, nameFilter]);
 
