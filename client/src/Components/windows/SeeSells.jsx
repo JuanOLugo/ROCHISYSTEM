@@ -57,7 +57,7 @@ export default function SeeSells() {
         <TableBody className='font-bold' >
           {facturas.map((factura) => (
             <TableRow key={factura._id}>
-              <TableCell className="border border-blue-500 font-bold  ">{factura._id}</TableCell>
+              <TableCell className="border border-blue-500 font-bold  ">{factura._id.slice(-5)}</TableCell>
               <TableCell className="border border-blue-500 font-bold ">{factura.date}</TableCell>
               <TableCell className="border border-blue-500 font-bold ">{factura.sellerName}</TableCell>
               <TableCell className="border border-blue-500 font-bold ">${factura.totalInvoice.toLocaleString("es-CO")}</TableCell>
