@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IoMdMenu } from "react-icons/io";
-import { WinContext } from "../../Context/WindowsContext";
 import { Navigate , Link} from "react-router-dom";
 export default function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
