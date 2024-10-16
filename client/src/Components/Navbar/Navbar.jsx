@@ -2,8 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IoMdMenu } from "react-icons/io";
 import { WinContext } from "../../Context/WindowsContext";
-import { useBadge } from "@nextui-org/react";
-
+import { Navigate , Link} from "react-router-dom";
 export default function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -11,40 +10,32 @@ export default function Navbar() {
     setMenuAbierto(!menuAbierto);
   };
 
-  const { principalWindows, setPrincipalWindows } = useContext(WinContext);
-
-  const HandlePrincipalWindow = (keyToSetTrue) => {
-    return Object.keys(principalWindows).reduce((newState, key) => {
-      newState[key] = key === keyToSetTrue ? true : false;
-      return newState;
-    }, {});
-  };
 
 
   const opcionesMenu = [
     {
       texto: "Crear producto",
-      action: "create_product",
+      action: "/createproduct",
     },
     {
       texto: "Crear factura",
-      action: "create_invoice",
+      action: "/createinvoice",
     },
     {
       texto: "Ver mis productos",
-      action: "see_product_list",
+      action: "/listproducts",
     },
     {
       texto: "Ver mis ventas",
-      action: "see_sells",
+      action: "/seesells",
     },
     {
       texto: "Ingresar inventario",
-      action: "see_product_sells",
+      action: "/registernewproducts",
     },
     {
       texto: "Abrir ventana",
-      href: "http://localhost:5173"
+      href: "http://localhost:5173",
     },
   ];
 
@@ -62,17 +53,25 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-1">
             {opcionesMenu.map((opcion, index) => (
               <div key={index}>
-                {
-                opcion.href ? <a href={opcion.href}  className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300" target="_blank">{opcion.texto}</a> : <button
-                key={index}
-                onClick={() =>
-                  setPrincipalWindows(HandlePrincipalWindow(opcion.action))
-                }
-                className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300"
-              >
-                {opcion.texto}
-              </button>
-              }
+                {opcion.href ? (
+                  <a
+                    href={opcion.href}
+                    className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300"
+                    target="_blank"
+                  >
+                    {opcion.texto}
+                  </a>
+                ) : (
+                  <button>
+                    <Link
+                    key={index}
+                    to={opcion.action}
+                    className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300"
+                  >
+                    {opcion.texto}
+                  </Link>
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -85,20 +84,17 @@ export default function Navbar() {
       </div>
       <div className={`md:hidden ${menuAbierto ? "block" : "hidden"}`}>
         {opcionesMenu.map((opcion, index) => (
-          <button
+          <Link
+            to={opcion.action}
             key={index}
-            onClick={() =>
-            {
-                setPrincipalWindows(HandlePrincipalWindow(opcion.action))
-                setMenuAbierto(!menuAbierto)
-            }
-              }
+            onClick={() => {
+              setMenuAbierto(!menuAbierto);
+            }}
             className="block w-full text-start py-2 px-4 text-sm hover:bg-primary-foreground hover:text-primary transition duration-300"
           >
             {opcion.texto}
-          </button>
+          </Link>
         ))}
-        
       </div>
     </nav>
   );

@@ -7,22 +7,23 @@ import CreateInvoice from "./Components/windows/CreateInvoice";
 import ListProducts from "./Components/windows/ListProducts";
 import SeeSells from "./Components/windows/SeeSells";
 import RegisterNewProducts from "./Components/windows/RegisterNewProducts";
-
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import NotFound from "./Components/windows/NotFound";
 function App() {
-  const { principalWindows, setPrincipalWindows } = useContext(WinContext);
 
-  
+
   return (
     <>
-      
-        <Navbar />
-        {Object.keys(principalWindows).filter(win => principalWindows[win] === true).length > 0 ? null : <WelcomeWindow/>}
-        {principalWindows.create_product ? <CreateProduct /> : null}
-        {principalWindows.create_invoice ? <CreateInvoice /> : null}
-        {principalWindows.see_product_list ? <ListProducts /> : null}
-        {principalWindows.see_sells ? <SeeSells /> : null}
-        {principalWindows.see_product_sells ? <RegisterNewProducts /> : null}
-     
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<WelcomeWindow />} />
+        <Route path="/createproduct" element={<CreateProduct />} />
+        <Route path="/createinvoice" element={<CreateInvoice />} />
+        <Route path="/listproducts" element={<ListProducts />} />
+        <Route path="/seesells" element={<SeeSells />} />
+        <Route path="/registernewproducts" element={<RegisterNewProducts />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
   );
 }
