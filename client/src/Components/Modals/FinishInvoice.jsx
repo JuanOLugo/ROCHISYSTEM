@@ -23,7 +23,7 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
   }, [isOpen]);
 
   const [ClientMoney, setClientMoney] = useState(0);
-
+  const [onButtonHandler, setonButtonHandler] = useState(true);
   const calculateChange = () => {
     const Change = parseInt(ClientMoney) - data.total;
     return Change;
@@ -53,9 +53,14 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
           theme: "dark",
         }
       );
+
+      setTimeout(() => {
+        setonButtonHandler(true)
+        onclose();
+      }, 100)
       setClientMoney(0);
       setProductos([]);
-      onclose();
+
     }
   };
 
@@ -66,64 +71,64 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
         <ModalContent>
           {(onClose) => (
             <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Finalizar factura
-                </ModalHeader>
-                <ModalBody className="font-bold">
-                  <h1 className="text-2xl font-bold">
-                    Total: ${data.total.toLocaleString("es-CO")}
-                  </h1>
-                  <input
-                    ref={ref}
-                    onChange={(e) => {
-                      if (e.target.value === "") {
-                        setClientMoney(0);
-                      } else {
-                        setClientMoney(e.target.value);
-                      }
-                    }}
-                    type="number"
-                    min={0}
-                    label="Total cliente"
-                    placeholder="Cantidad dada por el cliente"
-                    color="default"
-                    size="lg"
-                    className="font-bold py-2 rounded-lg px-2 text-xl border border-black text-black"
-                  />
-                  <h1
-                    className={`text-xl  text-black font-bold py-2 px-1 border border-black rounded-xl ${
-                      calculateChange() <= -1 ? " bg-red-500" : " bg-green-500"
-                    }`}
-                  >
-                    Devuelta: ${calculateChange().toLocaleString("es-co")}
-                  </h1>
-                  <select
-                    name=""
-                    id=""
-                    onChange={(e) => setPayMethod(e.target.value)}
-                    className="border border-black py-2 px-1 rounded-md"
-                  >
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Nequi">Nequi</option>
-                  </select>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="light"
-                    onPress={() => {
+              <ModalHeader className="flex flex-col gap-1">
+                Finalizar factura
+              </ModalHeader>
+              <ModalBody className="font-bold">
+                <h1 className="text-2xl font-bold">
+                  Total: ${data.total.toLocaleString("es-CO")}
+                </h1>
+                <input
+                  ref={ref}
+                  onChange={(e) => {
+                    if (e.target.value === "") {
                       setClientMoney(0);
-                      setPayMethod("Efectivo");
-                      onClose();
-                    }}
-                  >
-                    Cerrar
-                  </Button>
-
-                  <Button onPress={(e) => {
+                    } else {
+                      setClientMoney(e.target.value);
+                    }
+                  }}
+                  type="number"
+                  min={0}
+                  label="Total cliente"
+                  placeholder="Cantidad dada por el cliente"
+                  color="default"
+                  size="lg"
+                  className="font-bold py-2 rounded-lg px-2 text-xl border border-black text-black"
+                />
+                <h1
+                  className={`text-xl  text-black font-bold py-2 px-1 border border-black rounded-xl ${calculateChange() <= -1 ? " bg-red-500" : " bg-green-500"
+                    }`}
+                >
+                  Devuelta: ${calculateChange().toLocaleString("es-co")}
+                </h1>
+                <select
+                  name=""
+                  id=""
+                  onChange={(e) => setPayMethod(e.target.value)}
+                  className="border border-black py-2 px-1 rounded-md"
+                >
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Nequi">Nequi</option>
+                </select>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  onPress={() => {
+                    setClientMoney(0);
+                    setPayMethod("Efectivo");
+                    onClose();
+                  }}
+                >
+                  Cerrar
+                </Button>
+                <Button disabled={onButtonHandler} onPress={(e) => {
+                  setonButtonHandler(true)
                   GuardarFactura(e, onClose);
+
                 }} color="primary">Guardar</Button>
-                </ModalFooter>
+              </ModalFooter>
             </>
           )}
         </ModalContent>

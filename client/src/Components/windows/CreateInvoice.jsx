@@ -204,9 +204,6 @@ export default function CreateInvoice() {
     // Aquí iría la lógica para guardar la factura
     if (productos.length > 0) {
       setfullInvoice({
-        //nombreCliente,
-        //identificacionCliente,
-        // nombreVendedor,
         productos,
         total: calcularTotal(),
         totalMoney: 0,
