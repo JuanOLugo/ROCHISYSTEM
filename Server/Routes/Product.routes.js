@@ -1,9 +1,10 @@
-const { Router } = require("express");
+const { Router, json } = require("express");
 const product = require("../db/Models/product.dbmodel");
 const pRouter = Router();
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
+const converter = require("json-2-csv")
 pRouter.post("/create", async (req, res) => {
   const { codigo, nombre, PrecioCosto, Precioventa, proveedor, stock } =
     req.body;
@@ -60,12 +61,15 @@ pRouter.post("/update", async (req, res) => {
   );
 
   if (productAddForTicket.length > 0) {
-    const FileName = "registro.json";
+    const FileName = "registro.csv";
     const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
 
     // Uso de promesa para escribir el archivo
-
-    fs.writeFileSync(rutaDirectorio, JSON.stringify(productAddForTicket));
+    
+    fs.writeFileSync(rutaDirectorio, converter.json2csv(productAddForTicket, (err, csv) => {
+      if(err) console.log(err)
+      return csv
+    }) );
 
     try {
       exec("bartend", (err, data) => {
