@@ -224,6 +224,26 @@ export default function CreateInvoice() {
       });
   };
 
+  useEffect(() => {
+    if(productos.length > 0){
+      window.addEventListener('beforeunload', () => {
+        if(productos.length > 0){
+          const mensaje = '¿Estás seguro de que quieres salir?'; 
+          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
+        }
+      }); 
+
+      return () => { window.removeEventListener('beforeunload', () => {
+        if(productos.length > 0){
+          const mensaje = '¿Estás seguro de que quieres salir?'; 
+          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
+        }
+      }); };
+
+
+    }
+  }, [productos]);
+
   return (
     <div className="container mx-auto my-5">
       <ToastContainer containerId={2}/>

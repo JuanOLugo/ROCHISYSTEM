@@ -27,7 +27,7 @@ export default function RegisterNewProducts() {
   const [fullRegister, setFullRegister] = useState(null);
   const [GenerateTicked, setGenerateTicked] = useState(true);
   const [productExist, setproductExist] = useState(false)
-
+  
   useEffect(() => {
     const data = new Promise((res, rej) => {
       const data = GetProductAPI();
@@ -39,6 +39,28 @@ export default function RegisterNewProducts() {
         console.log("Recuerda que: " + err.response.data.message)
       );
   }, []);
+
+  
+  useEffect(() => {
+    if(productos.length > 0){
+      window.addEventListener('beforeunload', () => {
+        if(productos.length > 0){
+          const mensaje = '¿Estás seguro de que quieres salir?'; 
+          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
+        }
+      }); 
+
+      return () => { window.removeEventListener('beforeunload', () => {
+        if(productos.length > 0){
+          const mensaje = '¿Estás seguro de que quieres salir?'; 
+          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
+        }
+      }); };
+
+
+    }
+  }, [productos]);
+
 
   const ref = useRef()
 
