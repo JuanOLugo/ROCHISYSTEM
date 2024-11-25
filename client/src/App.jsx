@@ -9,6 +9,7 @@ import SeeSells from "./Components/windows/SeeSells";
 import RegisterNewProducts from "./Components/windows/RegisterNewProducts";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./Components/windows/NotFound";
+import Generatetickets from "./Components/windows/CreateTickets"
 function App() {
 
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/listproducts" element={<ListProducts />} />
         <Route path="/seesells" element={<SeeSells />} />
         <Route path="/registernewproducts" element={<RegisterNewProducts />} />
+        <Route path="/createtickets" element={<Generatetickets />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

@@ -8,23 +8,18 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import { GenerateTicketsAPI } from "../../Controllers/Tickets.controller";
 
-export default function RegisterNewProducts() {
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [identificacionCliente, setIdentificacionCliente] = useState("");
-  const [nombreVendedor, setNombreVendedor] = useState("");
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+export default function CreateTickets() {
   const [productFilterByName, setproductFilterByName] = useState([]);
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
-  const [precioCosto, setprecioCosto] = useState("");
   const [precioVenta, setprecioVenta] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [isFilterBycode, setisFilterBycode] = useState(false);
   const [productos, setProductos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
   const [DBProducts, setDBProducts] = useState(null);
-  const [fullRegister, setFullRegister] = useState(null);
   const [GenerateTicked, setGenerateTicked] = useState(true);
   const [productExist, setproductExist] = useState(false);
 
@@ -40,27 +35,8 @@ export default function RegisterNewProducts() {
       );
   }, []);
 
-  useEffect(() => {
-    if (productos.length > 0) {
-      window.addEventListener("beforeunload", () => {
-        if (productos.length > 0) {
-          const mensaje = "¿Estás seguro de que quieres salir?";
-          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-        }
-      });
-
-      return () => {
-        window.removeEventListener("beforeunload", () => {
-          if (productos.length > 0) {
-            const mensaje = "¿Estás seguro de que quieres salir?";
-            event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-          }
-        });
-      };
-    }
-  }, [productos]);
-
   const ref = useRef();
+  const refFocus = useRef();
 
   useEffect(() => {
     if (productos.length > 7) {
@@ -88,10 +64,8 @@ export default function RegisterNewProducts() {
                   ...p,
                   codigo,
                   nombre: nombreProducto,
-                  precioCosto,
                   precioVenta,
                   cantidad,
-                  GenerateTicked,
                 }
               : p
           )
@@ -105,20 +79,17 @@ export default function RegisterNewProducts() {
             id: Date.now(),
             codigo,
             nombre: nombreProducto,
-            precioCosto,
             precioVenta,
             cantidad,
-            GenerateTicked,
           },
         ]);
       }
       setCodigo("");
       setNombreProducto("");
-      setprecioCosto("");
       setprecioVenta("");
       setCantidad("");
       setisFilterBycode(false);
-      setGenerateTicked(true);
+      refFocus.current.focus()
     } else
       toast.error(`El producto que intenta agregar no existe`, {
         position: "bottom-right",
@@ -138,11 +109,9 @@ export default function RegisterNewProducts() {
     if (producto) {
       setCodigo(producto.codigo);
       setNombreProducto(producto.nombre);
-      setprecioCosto(producto.precioCosto);
       setprecioVenta(producto.precioVenta);
       setCantidad(producto.cantidad);
       setEditandoId(id);
-      setGenerateTicked(producto.GenerateTicked);
     }
   };
 
@@ -154,7 +123,7 @@ export default function RegisterNewProducts() {
     // Aquí iría la lógica para guardar la factura
     if (productos.length > 0) {
       try {
-        const response = await UpdateProductsAPI({ productos });
+        const response = await GenerateTicketsAPI({ productos });
         if (response.status === 400) {
           toast.warning(
             `Error con BARTENDER, comuniquese con el desarrollador`,
@@ -213,11 +182,11 @@ export default function RegisterNewProducts() {
       <div className="space-y-2">
         <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
           <h2 className="text-xl font-semibold mb-4 text-primary">
-            Actualizar producto
+            Generar Tickets
           </h2>
           <form
             onSubmit={agregarProducto}
-            className="grid grid-cols-1 md:grid-cols-5 gap-4"
+            className="grid grid-cols-1 md:grid-cols-5  gap-4"
           >
             <div>
               <label
@@ -230,6 +199,7 @@ export default function RegisterNewProducts() {
                 id="codigo"
                 type="text"
                 value={codigo}
+                ref={refFocus}
                 onChange={(e) => {
                   setCodigo(e.target.value);
                   const filterProduct = DBProducts.filter(
@@ -239,7 +209,6 @@ export default function RegisterNewProducts() {
                   if (filterProduct[0]) {
                     setNombreProducto(filterProduct[0].name);
                     setisFilterBycode(true);
-                    setprecioCosto(filterProduct[0].priceCost);
                     setprecioVenta(filterProduct[0].priceSell);
                   } else {
                     setisFilterBycode(false);
@@ -261,7 +230,7 @@ export default function RegisterNewProducts() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  e.target.value = e.target.value.toLowerCase()
+                  e.target.value = e.target.value.toLocaleLowerCase();
                   setNombreProducto(e.target.value);
                   const productFilter = DBProducts.filter((p) =>
                     p.name.toLowerCase().includes(e.target.value)
@@ -307,37 +276,6 @@ export default function RegisterNewProducts() {
             </div>
             <div>
               <label
-                htmlFor="costPrice"
-                className="block text-xs font-bold text-gray-700 mb-1"
-              >
-                Precio de costo
-              </label>
-              <input
-                id="costPrice"
-                type="number"
-                value={precioCosto}
-                onChange={(e) => setprecioCosto(e.target.value)}
-                required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="sellPrice"
-                className="block text-xs font-bold text-gray-700 mb-1"
-              >
-                Precio de venta
-              </label>
-              <input
-                id="sellPrice"
-                type="number"
-                value={precioVenta}
-                onChange={(e) => setprecioVenta(e.target.value)}
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
                 htmlFor="cantidad"
                 className="block text-xs font-bold text-gray-700 mb-1"
               >
@@ -350,21 +288,6 @@ export default function RegisterNewProducts() {
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
                 className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div className=" flex  ">
-              <label
-                htmlFor="costPrice"
-                className="block mr-5 text-xs font-bold text-gray-700 mb-1"
-              >
-                Generar Ticket
-              </label>
-              <input
-                id="costPrice"
-                type="checkbox"
-                checked={GenerateTicked}
-                onChange={(e) => setGenerateTicked(e.target.checked)}
-                className="scale-150"
               />
             </div>
             <div className="md:col-span-5">
@@ -388,6 +311,9 @@ export default function RegisterNewProducts() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                <th className="px-1 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                   Numero
+                  </th>
                   <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Código
                   </th>
@@ -395,16 +321,10 @@ export default function RegisterNewProducts() {
                     Nombre
                   </th>
                   <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Precio Costo
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Precio Venta
                   </th>
                   <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Cantidad
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Ticket
+                    Cantidad Tickets
                   </th>
                   <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
                     Acciones
@@ -414,6 +334,9 @@ export default function RegisterNewProducts() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {productos.map((producto, i) => (
                   <tr key={i}>
+                    <td className="px-1 py-1 whitespace-nowrap text-xs font-bold border border-black">
+                      {i + 1}
+                    </td>
                     <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       {producto.codigo}
                     </td>
@@ -421,16 +344,10 @@ export default function RegisterNewProducts() {
                       {producto.nombre}
                     </td>
                     <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      ${producto.precioCosto.toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       ${producto.precioVenta.toLocaleString("es-co")}
                     </td>
                     <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
                       {producto.cantidad}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.GenerateTicked ? "Si" : "No"}
                     </td>
                     <td className="px-6 py-1 border border-black text-xs whitespace-nowrap  font-bold">
                       <button

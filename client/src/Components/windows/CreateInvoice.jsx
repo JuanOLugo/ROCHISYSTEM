@@ -248,58 +248,6 @@ export default function CreateInvoice() {
     <div className="container mx-auto my-5">
       <ToastContainer containerId={2}/>
       <div className="space-y-2 ">
-        {/*<div className="bg-white shadow-lg rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
-            Información del Cliente y Vendedor
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label
-                htmlFor="nombreCliente"
-                className="block text-sm font-bold text-gray-700 mb-1"
-              >
-                Nombre del Cliente (Opcional)
-              </label>
-              <input
-                id="nombreCliente"
-                type="text"
-                value={nombreCliente}
-                onChange={(e) => setNombreCliente(e.target.value)}
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="identificacionCliente"
-                className="block text-sm font-bold text-gray-700 mb-1"
-              >
-                Identificación del Cliente (Opcional)
-              </label>
-              <input
-                id="identificacionCliente"
-                type="text"
-                value={identificacionCliente}
-                onChange={(e) => setIdentificacionCliente(e.target.value)}
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="nombreVendedor"
-                className="block text-sm font-bold text-gray-700 mb-1"
-              >
-                Nombre del Vendedor (Opcional)
-              </label>
-              <input
-                id="nombreVendedor"
-                type="text"
-                value={nombreVendedor}
-                onChange={(e) => setNombreVendedor(e.target.value)}
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-              />
-            </div>
-          </div>
-        </div>*/}
 
         <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
           <form
@@ -350,6 +298,7 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
+                  e.target.value = e.target.value.toLowerCase()
                   setNombreProducto(e.target.value);
                   const productFilter = DBProducts.filter((p) =>
                     p.name.toLowerCase().includes(e.target.value)
@@ -363,8 +312,8 @@ export default function CreateInvoice() {
                 required
                 className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
-              <div
-                className={`absolute overflow-y-scroll bg-blue-500 text-white h-28 w-48 my-2 rounded-md  ${
+                     <div
+                className={`absolute overflow-y-scroll bg-blue-500 text-white h-36 w-64 my-2 rounded-md  ${
                   productFilterByName.length == 0 ? "hidden" : "block"
                 }`}
               >
@@ -373,20 +322,18 @@ export default function CreateInvoice() {
                       return (
                         <div
                           key={i}
-                          className="hover:bg-white w-full pl-1 cursor-pointer hover:text-blue-500 transition-all"
+                          className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
                         >
                           <button
                             className="w-full text-start"
                             onClick={() => {
                               setCodigo(e.code);
                               setNombreProducto(e.name);
-                              setPrecio(e.priceSell);
+                              setprecioVenta(e.priceSell);
                               setproductFilterByName([]);
-                              setidIndividualProduct(e._id);
-                              setindividualMaxProduct(e.stock);
                             }}
                           >
-                            {e.name}{" "}
+                            {e.name}
                           </button>
                         </div>
                       );

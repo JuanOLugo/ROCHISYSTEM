@@ -12,7 +12,7 @@ app.use(express.json())
 //Api Routes
 app.use("/api/product", require("./Routes/Product.routes"))
 app.use("/api/invoice", require("./Routes/Invoice.Routes"))
-
+app.use("/api/tickets", require("./Routes/tickets.Routes"))
 
 // Puerto del servidor
 const port = 8528

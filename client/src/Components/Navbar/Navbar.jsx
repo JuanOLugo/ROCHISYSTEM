@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { IoClose } from "react-icons/io5";
 import { IoMdMenu } from "react-icons/io";
-import { Navigate , Link} from "react-router-dom";
+import { Navigate , Link, NavLink} from "react-router-dom";
 export default function Navbar() {
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -13,49 +13,54 @@ export default function Navbar() {
 
   const opcionesMenu = [
     {
-      texto: "Crear producto",
+      texto: "Crear producto ➕",
       action: "/createproduct",
     },
     {
-      texto: "Crear factura",
+      texto: "Crear factura 📃",
       action: "/createinvoice",
     },
     {
-      texto: "Ver mis productos",
+      texto: "Ver mis productos 🧦",
       action: "/listproducts",
     },
     {
-      texto: "Ver mis ventas",
+      texto: "Ver mis ventas 📈",
       action: "/seesells",
     },
     {
-      texto: "Ingresar inventario",
+      texto: "Ingresar inventario 🗳️",
       action: "/registernewproducts",
     },
     {
-      texto: "Abrir ventana",
-      href: "http://localhost:5173",
+      texto: "Generar tickers ✂️",
+      action: "/createtickets",
     },
+    {
+      texto: "💻",
+      href: "/",
+    },
+
   ];
 
   return (
     <nav className="bg-primary text-primary-foreground shadow-lg">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto py-4 px-5 md:px-0 ">
         <div className="flex justify-between">
-          <div className="flex space-x-7">
+          <div className="flex">
             <div>
-              <a href="#" className="flex items-center py-4 px-2">
-                <span className="font-semibold text-xl">Rochi System</span>
+              <a href="#" className=" ">
+                <span className="font-bold uppercase text-xl"><NavLink to={"/"}>Rochi System ♥️</NavLink></span>
               </a>
             </div>
           </div>
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-1 ">
             {opcionesMenu.map((opcion, index) => (
               <div key={index}>
                 {opcion.href ? (
                   <a
                     href={opcion.href}
-                    className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300"
+                    className="py-2 px-3 rounded-md hover:bg-primary-foreground text-sm hover:text-primary transition duration-300"
                     target="_blank"
                   >
                     {opcion.texto}
@@ -65,7 +70,7 @@ export default function Navbar() {
                     <Link
                     key={index}
                     to={opcion.action}
-                    className="py-2 px-3 rounded-md hover:bg-primary-foreground hover:text-primary transition duration-300"
+                    className="py-2 px-3 rounded-md hover:bg-primary-foreground text-sm  hover:text-primary transition duration-300"
                   >
                     {opcion.texto}
                   </Link>
