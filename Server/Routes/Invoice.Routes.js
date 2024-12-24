@@ -11,7 +11,8 @@ iRouter.post("/create", async (req, res) => {
   const productList = await Promise.all(
     invoice.productos.map(async (e) => {
       const product = await productModel.findById(e._id);
-      if (!product) throw new Error("Producto no encontrado");
+      console.log(product)
+      if (!product) throw new Error("ERROR PRODUCTO NO EXISTE")
       const newStock = product.stock - e.cantidad;
       await productModel.findByIdAndUpdate(e._id, {
         stock: newStock,

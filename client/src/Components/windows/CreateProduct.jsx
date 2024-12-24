@@ -82,7 +82,7 @@ export default function CreateProduct() {
           <h2 className="text-2xl font-bold mb-4 text-primary">
             Crear Producto
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4 ">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4 ">
             <div>
               <label
                 htmlFor="codigo"

@@ -216,6 +216,7 @@ export default function RegisterNewProducts() {
             Actualizar producto
           </h2>
           <form
+            autoComplete="off"
             onSubmit={agregarProducto}
             className="grid grid-cols-1 md:grid-cols-5 gap-4"
           >
@@ -227,6 +228,7 @@ export default function RegisterNewProducts() {
                 Código
               </label>
               <input
+              autoComplete="off"
                 id="codigo"
                 type="text"
                 value={codigo}
@@ -261,12 +263,13 @@ export default function RegisterNewProducts() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  e.target.value = e.target.value.toLowerCase()
+                  
                   setNombreProducto(e.target.value);
+                  const valuer = e.target.value.toLowerCase()
                   const productFilter = DBProducts.filter((p) =>
-                    p.name.toLowerCase().includes(e.target.value)
+                    p.name.toLowerCase().includes(valuer)
                   );
-                  if (e.target.value.length > 0) {
+                  if (valuer.length > 0) {
                     setproductFilterByName(productFilter);
                   } else {
                     setproductFilterByName([]);
@@ -293,6 +296,7 @@ export default function RegisterNewProducts() {
                             onClick={() => {
                               setCodigo(e.code);
                               setNombreProducto(e.name);
+                              setprecioCosto(e.priceCost)
                               setprecioVenta(e.priceSell);
                               setproductFilterByName([]);
                             }}

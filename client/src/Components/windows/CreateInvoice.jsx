@@ -115,6 +115,7 @@ export default function CreateInvoice() {
             return a;
           });
           setDBProducts(affectPDB);
+
           setProductos([
             ...productos,
             {
@@ -211,6 +212,7 @@ export default function CreateInvoice() {
         paymentMethod: null,
       });
 
+
       onOpen();
     } else toast.warning(`No hay productos que facturar`, {
       position: "bottom-right",
@@ -251,6 +253,7 @@ export default function CreateInvoice() {
 
         <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
           <form
+          autoComplete="off"
             onSubmit={agregarProducto}
             className="grid grid-cols-1  md:grid-cols-5 gap-4"
           >
@@ -298,12 +301,13 @@ export default function CreateInvoice() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  e.target.value = e.target.value.toLowerCase()
+                  
                   setNombreProducto(e.target.value);
+                  const valuer = e.target.value.toLowerCase()
                   const productFilter = DBProducts.filter((p) =>
-                    p.name.toLowerCase().includes(e.target.value)
+                    p.name.toLowerCase().includes(valuer)
                   );
-                  if (e.target.value.length > 0) {
+                  if (valuer.length > 0) {
                     setproductFilterByName(productFilter);
                   } else {
                     setproductFilterByName([]);
@@ -324,17 +328,19 @@ export default function CreateInvoice() {
                           key={i}
                           className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
                         >
-                          <button
-                            className="w-full text-start"
+                          <h1
+                            className="w-full text-start cursor-pointer"
                             onClick={() => {
                               setCodigo(e.code);
                               setNombreProducto(e.name);
-                              setprecioVenta(e.priceSell);
+                              setidIndividualProduct(e._id)
+                              setPrecio(e.priceSell);
+                              setindividualMaxProduct(e.stock);
                               setproductFilterByName([]);
                             }}
                           >
                             {e.name}
-                          </button>
+                          </h1>
                         </div>
                       );
                     })

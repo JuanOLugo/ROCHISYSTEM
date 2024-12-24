@@ -185,6 +185,7 @@ export default function CreateTickets() {
             Generar Tickets
           </h2>
           <form
+          autoComplete="off"
             onSubmit={agregarProducto}
             className="grid grid-cols-1 md:grid-cols-5  gap-4"
           >
@@ -230,12 +231,12 @@ export default function CreateTickets() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  e.target.value = e.target.value.toLocaleLowerCase();
-                  setNombreProducto(e.target.value);
+                  const valuer = e.target.value.toLocaleLowerCase();
+                  setNombreProducto(valuer);
                   const productFilter = DBProducts.filter((p) =>
-                    p.name.toLowerCase().includes(e.target.value)
+                    p.name.toLowerCase().includes(valuer)
                   );
-                  if (e.target.value.length > 0) {
+                  if (valuer.length > 0) {
                     setproductFilterByName(productFilter);
                   } else {
                     setproductFilterByName([]);
