@@ -1,15 +1,16 @@
-import { useDisclosure } from "@nextui-org/react";
+import { useBadge, useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
-import { GetProductAPI } from "../../Controllers/Product.controller";
+import {
+  GetProductAPI,
+  GETPRODUCTBYCODE,
+} from "../../Controllers/Product.controller";
 import { format } from "date-fns";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import FindProductByName from "../Insertions/FindProductByName";
 export default function CreateInvoice() {
-  // const [nombreCliente, setNombreCliente] = useState("");
-  //const [identificacionCliente, setIdentificacionCliente] = useState("");
-  //const [nombreVendedor, setNombreVendedor] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const date = new Date();
   const formattedDate = format(date, "yyyy-MM-dd");
@@ -21,168 +22,255 @@ export default function CreateInvoice() {
   const [isFilterBycode, setisFilterBycode] = useState(false);
   const [productos, setProductos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
-  const [DBProducts, setDBProducts] = useState(null);
+  const [DBProducts, setDBProducts] = useState([]);
   const [fullInvoice, setfullInvoice] = useState(null);
   const [idIndividualProduct, setidIndividualProduct] = useState(null);
   const [individualMaxProduct, setindividualMaxProduct] = useState(0);
-  const [productExist, setproductExist] = useState(false);
   const [productFilterByName, setproductFilterByName] = useState([]);
-  const [WaitVerification, setWaitVerification] = useState(false);
-  const ref = useRef();
+  const [InvoiceDiscont, setInvoiceDiscont] = useState(0);
+  const [DiscontSection, setDiscontSection] = useState(false);
+  const [VerifyProductIn, setVerifyProductIn] = useState(0);
+  const [globalError, setglobalError] = useState(false)
+  const refScroll = useRef(null);
+  const refInputPN = useRef(null);
+
+  //Reset Input Functions
+  const resetInputsF = () => {
+    setCodigo("");
+    setisFilterBycode(false);
+    setNombreProducto("");
+    setPrecio("");
+    setidIndividualProduct("");
+    setindividualMaxProduct("");
+    setCantidad(1);
+    setDescuento(0);
+  };
+
+
+  
+
+  //error management
+
+  const [codeFully, setCodeFully] = useState(false);
+  const [inputDiscount, setinputDiscount] = useState(false);
+  useEffect(() => {
+    if (codigo.length < 4) {
+      setCodeFully(false);
+      setisFilterBycode(false)
+      
+    }else filterProductByCode(codigo)
+
+
+  }, [codigo]);
 
   useEffect(() => {
+      if(codeFully || inputDiscount){
+        setglobalError(true)
+        console.log("error")
+      }else {
+        setglobalError(false)
+        console.log("noerror")
+      }
+  }, [codeFully, inputDiscount])
+  
+  //AutoScrollTop
+  useEffect(() => {
     if (productos.length > 9) {
-      ref.current.scrollTop = ref.current.scrollHeight;
+      refScroll.current.scrollTop = refScroll.current.scrollHeight;
     }
   }, [productos]);
 
-  useEffect(() => {
-    const data = new Promise((res, rej) => {
-      const data = GetProductAPI();
-      data ? res(data) : rej({ message: "Error" });
-    });
-    data
-      .then((data) => setDBProducts(data.data))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
-  }, []);
+  //Filtrar producto por codigo
 
-  useEffect(() => {
-    if (codigo) {
-      const verify = DBProducts.filter((p) => p.code === codigo);
-      if (verify.length > 0) {
-        setproductExist(true);
-      } else setproductExist(false);
-    }
-
-    setWaitVerification(true);
-  }, [codigo]);
-
-  const agregarProducto = (e) => {
-    e.preventDefault();
-    const verify = DBProducts.filter((p) => p.code === codigo);
-    if (verify.length > 0) {
-      if (editandoId !== null) {
-        const affectPDB = DBProducts.filter((a) => {
-          if (a._id === editandoId) {
-            a.stock = a.stock - cantidad;
+  const filterProductByCode = async (codigo) => {
+    if (codigo.length === 4) {
+      const verify = DBProducts.some((p) => p.code === codigo);
+      if (!verify) {
+        try {
+          const data = await GETPRODUCTBYCODE({ code: codigo });
+          const individualProduct = data.data.product;
+          if (data) {
+            const validation = DBProducts.some(
+              (p) => p.code === individualProduct.code
+            );
+            if (!validation) setDBProducts([...DBProducts, individualProduct]);
+            if (individualProduct) {
+              setisFilterBycode(true);
+              setNombreProducto(individualProduct.name);
+              setPrecio(individualProduct.priceSell);
+              setidIndividualProduct(individualProduct._id);
+              setindividualMaxProduct(individualProduct.stock);
+              setCodeFully(false);
+            } else {
+              setisFilterBycode(false);
+            }
           }
-          return a;
-        });
-        setDBProducts(affectPDB);
-        setProductos(
-          productos.map((p) =>
-            p._id === editandoId
-              ? {
-                  ...p,
-                  codigo,
-                  nombre: nombreProducto,
-                  precio,
-                  descuento,
-                  cantidad,
-                }
-              : p
-          )
-        );
-        setEditandoId(null);
-        setisFilterBycode(false);
-        setindividualMaxProduct(0);
+        } catch (error) {
+          console.log(error)
+          setCodeFully(true);
+          if(nombreProducto.length > 1){
+            setTimeout(() => {
+              resetInputsF()
+            }, 500)
+          }
+        }
       } else {
-        const ff = productos.filter((e) => e.codigo == codigo);
-        if (ff.length > 0) {
-          const findIfProductExistIn = ff.reduce((acumulador, producto) => {
-            if (producto.codigo === codigo) {
-              return producto.cantidad + cantidad;
-            }
-            return acumulador;
-          }, null);
-
-          ff[0].cantidad = findIfProductExistIn;
-
-          const affectPDB = DBProducts.filter((a) => {
-            if (a._id === idIndividualProduct) {
-              a.stock = a.stock - cantidad;
-            }
-            return a;
-          });
-          setDBProducts(affectPDB);
+        const individualProduct = DBProducts.filter(
+          (p) => p.code === e.target.value
+        )[0];
+        if (individualProduct) {
+          setisFilterBycode(true);
+          setNombreProducto(individualProduct.name);
+          setPrecio(individualProduct.priceSell);
+          setidIndividualProduct(individualProduct._id);
+          setindividualMaxProduct(individualProduct.stock);
         } else {
-          const affectPDB = DBProducts.filter((a) => {
-            if (a._id === idIndividualProduct) {
-              a.stock = a.stock - cantidad;
-            }
-            return a;
-          });
-          setDBProducts(affectPDB);
-
-          setProductos([
-            ...productos,
-            {
-              _id: idIndividualProduct,
-              codigo,
-              nombre: nombreProducto,
-              precio,
-              descuento,
-              cantidad,
-            },
-          ]);
+          setisFilterBycode(false);
         }
       }
+    }
+  };
 
-      setCodigo("");
-      setNombreProducto("");
-      setPrecio(0);
-      setDescuento(0);
-      setCantidad(1);
-      setisFilterBycode(false);
-      setidIndividualProduct(null);
-      setindividualMaxProduct(100);
-    } else
-      toast.error(`CODIGO: ${codigo} No existe`, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
+  //discoun all the invoice
+
+  useEffect(() => {
+    if (isNaN(InvoiceDiscont) || InvoiceDiscont === 0) {
+      setProductos(
+        productos.map((n) => {
+          n.descuento = 0;
+          return n;
+        })
+      );
+    } else {
+      if (productos.length > 0 && !isNaN(InvoiceDiscont)) {
+        setProductos(
+          productos.map((n) => {
+            n.descuento = InvoiceDiscont;
+            return n;
+          })
+        );
+        setinputDiscount(false);
+      }
+
+      if (productos.length === 0) {
+        setinputDiscount(true);
+        setInvoiceDiscont("");
+      }
+      console.log("2");
+    }
+  }, [InvoiceDiscont, VerifyProductIn]);
+
+  //Agregar productos a la factura
+
+  const AddAndEditProducts = (e) => {
+    e.preventDefault();
+    if (idIndividualProduct) {
+      const pt = DBProducts.filter((p) => {
+        if (p._id === idIndividualProduct) {
+          p.stock = p.stock - cantidad;
+          return p;
+        }
+      });
+
+      if (!productos.some((p) => p.codigo === codigo)) {
+        const productToAdd = {
+          _id: idIndividualProduct,
+          id: +new Date(),
+          codigo,
+          precio,
+          precioCosto: pt[0].priceCost,
+          cantidad,
+          nombreProducto,
+          descuento,
+        };
+
+        console.log(
+          "Ganancia del producto: " +
+            (productToAdd.precio - productToAdd.precioCosto)
+        );
+
+        setProductos([...productos, productToAdd]);
+        resetInputsF();
+
+        if (InvoiceDiscont === 0) {
+          setInvoiceDiscont(0);
+        } else {
+          setVerifyProductIn(VerifyProductIn + 1);
+        }
+      } else {
+        const AddnewAmount = productos.filter((p) => {
+          if (p.codigo === codigo) {
+            p.cantidad = p.cantidad + cantidad;
+          }
+
+          return p;
         });
+        setProductos(AddnewAmount);
+        resetInputsF();
+      }
+    }
+
+    if (editandoId) {
+      const editingProducts = productos.filter((p) => {
+        if (p.id === editandoId) {
+          p.cantidad = cantidad;
+          p.descuento = descuento;
+          p.precio = precio;
+          DBProducts.filter((e) => {
+            if (e._id === p._id) {
+              e.stock = e.stock - cantidad;
+            }
+          });
+        }
+        return p;
+      });
+
+      setProductos(editingProducts);
+      setEditandoId(null);
+      setindividualMaxProduct(0);
+      resetInputsF();
+    }
   };
 
   const editarProducto = (id) => {
-    const producto = productos.find((p) => p._id === id);
-    setisFilterBycode(true);
-    if (producto) {
-      setCodigo(producto.codigo);
-      setNombreProducto(producto.nombre);
-      setPrecio(producto.precio);
-      setDescuento(producto.descuento);
-      setCantidad(producto.cantidad);
+    const productFilter = productos.filter((p) => {
+      if (p.id === id) {
+        return p;
+      }
+    })[0];
 
-      const affectPDB = DBProducts.filter((a) => {
-        if (a._id === id) {
-          a.stock = a.stock + producto.cantidad;
+    const { cantidad, codigo, descuento, nombreProducto, precio, _id } =
+      productFilter;
+    setCodigo(codigo);
+    setCantidad(cantidad);
+    setNombreProducto(nombreProducto);
+    setDescuento(descuento);
+    setPrecio(precio);
+
+    const affectPDB = DBProducts.filter((a) => {
+      if (a._id === _id) {
+        a.stock = a.stock + cantidad;
+      }
+      return a;
+    });
+
+    setindividualMaxProduct(
+      affectPDB.filter((e) => {
+        if (e._id == _id) {
+          return e.stock;
         }
-        return a;
-      });
+      })[0].stock
+    );
 
-      setindividualMaxProduct(
-        affectPDB.filter((e) => {
-          if (e._id == id) {
-            return e.stock;
-          }
-        })[0].stock
-      );
-      setDBProducts(affectPDB);
-      setEditandoId(id);
-    }
+    setDBProducts(affectPDB);
+    setEditandoId(id);
   };
 
   const eliminarProducto = (id, stock) => {
+    console.log(stock);
     const renewStock = DBProducts.filter((p) => {
       if (p._id === id) {
+        console.log(p.stock);
         p.stock = p.stock + stock;
       }
 
@@ -212,86 +300,62 @@ export default function CreateInvoice() {
         paymentMethod: null,
       });
 
-
       onOpen();
-    } else toast.warning(`No hay productos que facturar`, {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
+    } else
+      toast.warning(`No hay productos que facturar`, {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
       });
   };
 
-  useEffect(() => {
-    if(productos.length > 0){
-      window.addEventListener('beforeunload', () => {
-        if(productos.length > 0){
-          const mensaje = '¿Estás seguro de que quieres salir?'; 
-          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-        }
-      }); 
-
-      return () => { window.removeEventListener('beforeunload', () => {
-        if(productos.length > 0){
-          const mensaje = '¿Estás seguro de que quieres salir?'; 
-          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-        }
-      }); };
-
-
-    }
-  }, [productos]);
-
   return (
-    <div className="container mx-auto my-5">
-      <ToastContainer containerId={2}/>
-      <div className="space-y-2 ">
-
-        <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
+    <div className=" bg-gray-900 h-screen grid ">
+      <ToastContainer containerId={2} />
+      <div className="space-y-2  ">
+        <div className="px-5">
           <form
-          autoComplete="off"
-            onSubmit={agregarProducto}
-            className="grid grid-cols-1  md:grid-cols-5 gap-4"
+            autoComplete="off"
+            onSubmit={(e) => globalError ? e.preventDefault() : AddAndEditProducts(e) }
+            className="grid grid-cols-1  md:grid-cols-5 gap-2"
           >
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Código
               </label>
+
               <input
                 id="codigo"
                 type="text"
+                minLength={4}
+                maxLength={4}
+                placeholder="Codigo"
                 value={codigo}
-                onChange={(e) => {
-                  setCodigo(e.target.value);
-                  const filterProduct = DBProducts.filter(
-                    (product) => product.code == e.target.value
-                  );
-
-                  if (filterProduct[0]) {
-                    setNombreProducto(filterProduct[0].name);
-                    setPrecio(filterProduct[0].priceSell);
-                    setisFilterBycode(true);
-                    setidIndividualProduct(filterProduct[0]._id);
-                    setindividualMaxProduct(filterProduct[0].stock);
-                  } else {
-                    setisFilterBycode(false);
-                  }
-                }}
+                onChange={(e) => setCodigo(e.target.value)}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className={`w-full px-3  py-1 ${
+                  !codeFully
+                    ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                    : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
+                } text-gray-200`}
               />
+              <h1 className="  text-sm text-red-700 opacity-50 ">
+                {codeFully ? "No existe este codigo" : null}
+              </h1>
             </div>
-            <div>
+            <div  >
+
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm font-bold text-gray-700 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-200  mb-1"
               >
                 Nombre del Producto
               </label>
@@ -299,11 +363,13 @@ export default function CreateInvoice() {
                 readOnly={isFilterBycode}
                 id="nombreProducto"
                 type="text"
+                ref={refInputPN}
+                placeholder="Filtra el nombre del producto"
                 value={nombreProducto}
+                
                 onChange={(e) => {
-                  
                   setNombreProducto(e.target.value);
-                  const valuer = e.target.value.toLowerCase()
+                  const valuer = e.target.value.toLowerCase();
                   const productFilter = DBProducts.filter((p) =>
                     p.name.toLowerCase().includes(valuer)
                   );
@@ -314,43 +380,25 @@ export default function CreateInvoice() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
-                     <div
-                className={`absolute overflow-y-scroll bg-blue-500 text-white h-36 w-64 my-2 rounded-md  ${
-                  productFilterByName.length == 0 ? "hidden" : "block"
-                }`}
-              >
-                {productFilterByName.length > 0
-                  ? productFilterByName.map((e, i) => {
-                      return (
-                        <div
-                          key={i}
-                          className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
-                        >
-                          <h1
-                            className="w-full text-start cursor-pointer"
-                            onClick={() => {
-                              setCodigo(e.code);
-                              setNombreProducto(e.name);
-                              setidIndividualProduct(e._id)
-                              setPrecio(e.priceSell);
-                              setindividualMaxProduct(e.stock);
-                              setproductFilterByName([]);
-                            }}
-                          >
-                            {e.name}
-                          </h1>
-                        </div>
-                      );
-                    })
-                  : null}
-              </div>
+              <FindProductByName
+                name={nombreProducto}
+                refInput ={refInputPN ? refInputPN : null}
+                setters={{
+                  setCodigo,
+                  setNombreProducto,
+                  setidIndividualProduct,
+                  setPrecio,
+                  setindividualMaxProduct,
+                  setproductFilterByName,
+                }}
+              />
             </div>
             <div>
               <label
                 htmlFor="precio"
-                className="block text-sm font-bold text-gray-700 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
               >
                 Precio
               </label>
@@ -360,15 +408,16 @@ export default function CreateInvoice() {
                 value={precio}
                 onChange={(e) => setPrecio(e.target.value)}
                 min="0"
+                placeholder="Precio"
                 step="0.01"
                 required
-                className="w-full px-3 py-1 border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="descuento"
-                className="block text-sm font-bold text-gray-700 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
               >
                 Descuento (%)
               </label>
@@ -376,16 +425,17 @@ export default function CreateInvoice() {
                 id="descuento"
                 type="number"
                 value={descuento}
+                placeholder="Porcentaje descuento"
                 onChange={(e) => setDescuento(e.target.value)}
                 min="0"
                 max="100"
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm font-bold text-gray-700 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
               >
                 Cantidad
               </label>
@@ -395,15 +445,16 @@ export default function CreateInvoice() {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 min="1"
+                placeholder="Cantidad a llevar"
                 max={individualMaxProduct}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div className="md:col-span-5">
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-1  px-4 rounded-md hover:bg-primary-dark transition duration-300"
+                className="w-full bg-primary text-primary-foreground py-1  px-4  hover:bg-primary-dark transition duration-300"
               >
                 {editandoId !== null
                   ? "Actualizar Producto"
@@ -413,56 +464,59 @@ export default function CreateInvoice() {
           </form>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg px-3 py-1">
-          <h2 className="text-xl font-semibold mb-2 text-primary">
+        <div className=" px-5 ">
+          <h2 className="text-xl font-semibold mb-2 text-gray-200 my-2">
             Productos en la Factura
           </h2>
-          <div className="overflow-x-auto overflow-scroll h-64" ref={ref}>
+          <div
+            className="overflow-x-auto overflow-scroll h-72 border rounded-sm bg-gray-900  "
+            ref={refScroll}
+          >
             <table className="min-w-full divide-y divide-gray-200 ">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-700">
                 <tr>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Código
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Nombre
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Precio
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Descuento
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Cantidad
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Total
                   </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200 ">
+              <tbody className="bg-white divide-y  divide-gray-200 ">
                 {productos.map((producto) => (
-                  <tr key={producto._id} className="border-b-1 border-black">
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
+                  <tr key={producto.id} className="border-b-1 border-gray-200">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
                       {producto.codigo}
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.nombre}
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
+                      {producto.nombreProducto}
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
                       ${producto.precio.toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs  font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base  font-normal border border-gray-800">
                       {producto.descuento}%
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
                       {producto.cantidad}
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black ">
+                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800 ">
                       $
                       {(
                         producto.precio *
@@ -470,10 +524,10 @@ export default function CreateInvoice() {
                         (1 - producto.descuento / 100)
                       ).toLocaleString("es-co")}
                     </td>
-                    <td className="px-6 py-1 whitespace-nowrap border text-xs border-black  font-bold">
+                    <td className="px-6 py-1 whitespace-nowrap border text-xs lg:text-base border-gray-800  font-normal">
                       <button
-                        onClick={() => editarProducto(producto._id)}
-                        className="text-indigo-600 text-xs hover:text-indigo-900 mr-2"
+                        onClick={() => editarProducto(producto.id)}
+                        className="text-indigo-600 text-xs lg:text-base hover:text-indigo-900 mr-2"
                       >
                         Editar
                       </button>
@@ -481,7 +535,7 @@ export default function CreateInvoice() {
                         onClick={() =>
                           eliminarProducto(producto._id, producto.cantidad)
                         }
-                        className="text-red-600 text-xs  hover:text-red-900"
+                        className="text-red-600 text-xs lg:text-base  hover:text-red-900"
                       >
                         Eliminar
                       </button>
@@ -491,16 +545,51 @@ export default function CreateInvoice() {
               </tbody>
             </table>
           </div>
+
           <div className="mt-3 flex justify-between items-center">
-            <span className="text-xl font-bold">
+            <span className="text-xl font-normal text-gray-200">
               Total: ${calcularTotal().toLocaleString("es-co")}
             </span>
-            <button
-              onClick={finishFactura}
-              className="bg-green-500 text-white py-1  px-4 rounded-md hover:bg-green-600 transition duration-300"
-            >
-              Guardar Factura
-            </button>
+
+            {DiscontSection ? (
+              <div className="  bg-gray-700 w-72  p-2 rounded-sm">
+                <label htmlFor="" className="text-gray-200 font-light ">
+                  Porcentaje de descuento a la factura
+                </label>
+                <input
+                  type="number"
+                  placeholder="Porcentaje %"
+                  value={InvoiceDiscont}
+                  onChange={(e) => setInvoiceDiscont(parseInt(e.target.value))}
+                  className={`w-full px-3  py-1 ${
+                    !inputDiscount
+                      ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                      : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
+                  } text-gray-200`}
+                />
+                <h1 className="  text-sm text-red-700 opacity-50 ">
+                  {inputDiscount
+                    ? "No hay productos para hacer descuento "
+                    : null}
+                </h1>
+              </div>
+            ) : null}
+
+            <div>
+              <button
+                onClick={() => setDiscontSection(!DiscontSection)}
+                className=" text-white py-1  px-4 mr-3  bg-blue-600 hover:bg-blue-500 transition duration-300 border border-blue-900"
+              >
+                Agregar descuento a la factura
+              </button>
+
+              <button
+                onClick={finishFactura}
+                className=" text-white py-1  px-4  bg-emerald-500 hover:bg-emerald-400 transition duration-300 border border-emerald-900"
+              >
+                Guardar Factura
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -511,6 +600,7 @@ export default function CreateInvoice() {
         onOpenChange={onOpenChange}
         data={fullInvoice}
         setProductos={setProductos}
+        setDiscount={setInvoiceDiscont}
       />
     </div>
   );

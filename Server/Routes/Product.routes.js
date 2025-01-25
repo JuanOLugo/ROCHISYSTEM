@@ -4,7 +4,22 @@ const pRouter = Router();
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
-const converter = require("json-2-csv")
+const converter = require("json-2-csv");
+
+
+//Code generator
+
+function generarCodigoUnico() {
+  // El primer dígito no puede ser 0
+  const primerDigito = Math.floor(Math.random() * 9) + 1; // Genera un número entre 1 y 9
+  // Los otros tres dígitos pueden ser cualquier número entre 0 y 9
+  const siguienteDigitos = Math.floor(Math.random() * 1000); // Genera un número entre 000 y 999
+  // Asegura que siempre tenga 3 dígitos, añadiendo ceros a la izquierda si es necesario
+  const codigo = primerDigito.toString() + siguienteDigitos.toString().padStart(3, '0');
+  return codigo;
+}
+
+
 pRouter.post("/create", async (req, res) => {
   const { codigo, nombre, PrecioCosto, Precioventa, proveedor, stock } =
     req.body;
@@ -65,11 +80,14 @@ pRouter.post("/update", async (req, res) => {
     const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
 
     // Uso de promesa para escribir el archivo
-    
-    fs.writeFileSync(rutaDirectorio, converter.json2csv(productAddForTicket, (err, csv) => {
-      if(err) console.log(err)
-      return csv
-    }) );
+
+    fs.writeFileSync(
+      rutaDirectorio,
+      converter.json2csv(productAddForTicket, (err, csv) => {
+        if (err) console.log(err);
+        return csv;
+      })
+    );
 
     try {
       exec("bartend", (err, data) => {
@@ -114,6 +132,53 @@ pRouter.get("/get", async (req, res) => {
   const products = await product.find();
   if (products.length > 0) return res.status(200).send(products);
   res.status(400).send({ message: "No existen productos" });
+});
+
+pRouter.get("/getproductcode", async (req, res) => {
+  //Get all products
+
+  const products = await product.find();
+  let codeGen = generarCodigoUnico().toString()
+  const productExist = products.map((p) => {
+    
+    while (products.some((p) => p.code === codeGen)) {
+      codeGen = generarCodigoUnico().toString()
+      console.log("igual")
+    } 
+  });
+
+  if(codeGen){
+    
+    res.status(200).send({code: codeGen})
+  }
+});
+
+pRouter.post("/getproductbycode", async (req, res) => {
+  //Get all products
+  const {code} = req.body
+  console.log(code)
+  const productFilter = await product.findOne({code: code});
+
+  if(productFilter){
+    res.status(200).send({product: productFilter})
+  } else res.status(400).send({message: "No se encontro producto"})
+
+});
+
+pRouter.post("/getproductbyname", async (req, res) => {
+  //Get all products
+  let {name} = req.body
+  name = name.toLowerCase()
+  const products = await product.find();
+  
+  const productsFilter = products.filter(p => {
+    if(p.name.toLowerCase().includes(name)) return p
+  })
+  console.log(productsFilter)
+  if(productsFilter){
+    res.status(200).send({product: productsFilter})
+  } else res.status(400).send({message: "No se encontro producto"})
+
 });
 
 module.exports = pRouter;

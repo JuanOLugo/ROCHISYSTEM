@@ -13,7 +13,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { CreateInvoiceAPI } from "../../Controllers/Invoice.controller";
-function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
+function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDiscount }) {
   const ref = useRef();
 
   useEffect(() => {
@@ -60,6 +60,7 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos }) {
       }, 100)
       setClientMoney(0);
       setProductos([]);
+      setDiscount("")
 
     }
   };

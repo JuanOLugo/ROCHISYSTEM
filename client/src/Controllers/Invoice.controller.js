@@ -18,6 +18,10 @@ export const UpdateProductsAPI = async (data) => {
 };
 
 export const DeleteInvoiceAPI = async (data) => {
-    const response = await axios.post(proxy + "delete", data);
-    return response;
-  };
+  const response = await axios.post(proxy + "delete", data);
+  return response;
+};
+
+export const VERIFYTOTALWINDAY = async (data) => {
+  return await axios.post(proxy + "verifyTotalWinDay", data);
+};

@@ -2,26 +2,27 @@ const { Router } = require("express");
 const Invoice = require("../db/Models/Invoice.dbmodel");
 const productModel = require("../db/Models/product.dbmodel");
 
-
 const iRouter = Router();
 
 iRouter.post("/create", async (req, res) => {
   const { invoice } = req.body;
-
   const productList = await Promise.all(
     invoice.productos.map(async (e) => {
       const product = await productModel.findById(e._id);
-      console.log(product)
-      if (!product) throw new Error("ERROR PRODUCTO NO EXISTE")
+      if (!product) throw new Error("ERROR PRODUCTO NO EXISTE");
       const newStock = product.stock - e.cantidad;
-      await productModel.findByIdAndUpdate(e._id, {
+      const updatedProduct = await productModel.findByIdAndUpdate(e._id, {
         stock: newStock,
       });
+
+      const { _id, code, name, priceCost, priceSell, stock } = updatedProduct;
+
       return {
-        _id: e._id,
-        code: e.codigo,
-        name: e.nombre,
-        priceSell: e.precio,
+        _id: _id,
+        code: code,
+        name: name,
+        priceSell: priceSell,
+        priceCost: priceCost,
         amount: e.cantidad,
         discount: e.descuento,
       };
@@ -63,7 +64,7 @@ iRouter.post("/delete", async (req, res) => {
   const { id } = req.body;
 
   let filterInvoice = await Invoice.findById(id);
-  const productList = filterInvoice.productList
+  const productList = filterInvoice.productList;
   const newPromiseAll = Promise.all(
     productList.map(async (e) => {
       const filterProduct = await productModel.findById(e._id);
@@ -82,6 +83,28 @@ iRouter.post("/delete", async (req, res) => {
   filterInvoice
     ? res.status(200).send({ message: "Eliminado correctamente" })
     : res.status(400).send({ message: "Error al eliminar" });
+});
+
+iRouter.post("/verifyTotalWinDay", async (req, res) => {
+  const { date } = req.body;
+
+  let filterInvoice = await Invoice.find({ date });
+  const v = filterInvoice.map((i) => i.productList)
+
+  const validation = v.reduce((totalWinningSum, group) => {
+    const groupTotal = group.reduce((groupSum, e) => {
+      const sumPrices = e.priceSell * e.amount;
+      const totalDiscount = sumPrices * (e.discount / 100);
+      const sumTotalAfterDiscount = sumPrices - totalDiscount;
+      const sumPriceCost = (e.priceCost || 0) * e.amount;
+      const totalWinning = sumTotalAfterDiscount - sumPriceCost;
+      return groupSum + totalWinning;
+    }, 0);
+    return totalWinningSum + groupTotal;
+  }, 0);
+
+  if(validation) return res.status(200).send({totalWinning: validation})
+  else return res.status(400).send({message: "No hay ingresos de ganancias fijos"})
 });
 
 module.exports = iRouter;

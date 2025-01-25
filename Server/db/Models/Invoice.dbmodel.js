@@ -12,6 +12,7 @@ const invoiceSchema = new Schema({
         code: String,
         name: String,
         priceSell: Number,
+        priceCost: Number,
         amount:Number,
         discount:Number
       

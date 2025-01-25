@@ -18,6 +18,19 @@ export const UpdateProductsAPI = async (data) => {
 };
 
 export const DeleteProductAPI = async (data) => {
-    const response = await axios.post(proxy + "delete", data);
-    return response;
-  };
+  const response = await axios.post(proxy + "delete", data);
+  return response;
+};
+
+export const GETPRODUCTCODE = async (data) => {
+  return await axios.get(proxy + "getproductcode", data);
+};
+
+export const GETPRODUCTBYCODE = async (data) => {
+  return await axios.post(proxy + "getproductbycode", data);
+};
+
+
+export const GETPRODUCTBYNAME = async (data) => {
+  return await axios.post(proxy + "getproductbyname", data);
+};

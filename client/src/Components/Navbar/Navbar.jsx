@@ -44,8 +44,8 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="bg-primary text-primary-foreground shadow-lg">
-      <div className="max-w-6xl mx-auto py-4 px-5 md:px-0 ">
+    <nav className="bg-gray-900 text-gray-200 shadow-lg border-b border-gray-700">
+      <div className="max-w-6xl mx-auto py-2 px-5 md:px-0 ">
         <div className="flex justify-between">
           <div className="flex">
             <div>
