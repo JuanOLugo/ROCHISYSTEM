@@ -30,13 +30,14 @@ iRouter.post("/create", async (req, res) => {
   );
 
   const newInvoice = new Invoice({
-    clientName: invoice.nombreCliente,
-    idClient: invoice.identificacionCliente,
-    sellerName: invoice.nombreVendedor,
+    clientName: invoice.nombreCliente || "Local",
+    idClient: invoice.identificacionCliente || "Local",
+    sellerName: invoice.nombreVendedor || "Interno Miscelanea",
     productList: productList,
     totalInvoice: invoice.total,
     moneyGave: invoice.totalMoney,
     date: invoice.date,
+    totalNequi: invoice.nequiTotal || null,
     payMethod: invoice.paymentMethod,
   });
 

@@ -19,6 +19,7 @@ const invoiceSchema = new Schema({
     },
   ],
   totalInvoice: Number,
+  totalNequi: Number,
   moneyGave: Number,
   date: String,
   payMethod: String,

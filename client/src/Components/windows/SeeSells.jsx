@@ -52,7 +52,14 @@ export default function SeeSells() {
   );
   const totalNequi = facturas
     .filter((factura) => factura.payMethod === "Nequi")
-    .reduce((sum, factura) => sum + factura.totalInvoice, 0);
+    .reduce((sum, factura) => {
+      if (factura.totalNequi) {
+          return sum + factura.totalNequi; // Suma totalNequi si existe
+      } else {
+          return sum + factura.totalInvoice; // Suma totalInvoice si totalNequi no existe
+      }
+  }, 0);
+
 
   const eliminarFactura = (id) => {
     const promt = prompt("Contraseña");

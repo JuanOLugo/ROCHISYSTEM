@@ -24,35 +24,46 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDi
 
   const [ClientMoney, setClientMoney] = useState(0);
   const [onButtonHandler, setonButtonHandler] = useState(true);
+  const [NequiValue, setNequiValue] = useState(null)
+
   const calculateChange = () => {
     const Change = parseInt(ClientMoney) - data.total;
     return Change;
   };
+
+
   const [PayMethod, setPayMethod] = useState("Efectivo");
   const GuardarFactura = async (e, onclose) => {
     if (ClientMoney > 0) {
       data.totalMoney = parseInt(ClientMoney);
       data.paymentMethod = PayMethod;
-      const response = new Promise(resolve => resolve(CreateInvoiceAPI({ invoice: data })));
-      setPayMethod("Efectivo");
-      toast.promise(
-        response,
-        {
-          pending: "Creando factura..",
-          success: "Factura creada 👌",
-          error: "Error al crear factura 🤯",
-        },
-        {
+      data = { ...data, nequiTotal: NequiValue }
+
+      try {
+        await CreateInvoiceAPI({ invoice: data })
+        toast.success('Factura Creada ✅', {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
-          closeOnClick: true,
+          closeOnClick: false,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
           theme: "dark",
-        }
-      );
+        });
+      } catch (error) {
+        toast.error('error.message', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+      setPayMethod("Efectivo");
 
       setTimeout(() => {
         setonButtonHandler(true)
@@ -105,12 +116,45 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDi
                 <select
                   name=""
                   id=""
-                  onChange={(e) => setPayMethod(e.target.value)}
+                  value={PayMethod}
+                  onChange={(e) => {
+                    setPayMethod(e.target.value)
+                    if (e.target.value == "Nequi") {
+                      setNequiValue(data.total)
+                    }
+                  }}
                   className="border border-black py-2 px-1 rounded-md"
                 >
                   <option value="Efectivo">Efectivo</option>
                   <option value="Nequi">Nequi</option>
                 </select>
+
+                {
+                  PayMethod == "Nequi" ? <>
+
+                    <h1>Cantidad Nequi</h1>
+                    <input
+                      onChange={(e) => {
+
+                        if (e.target.value == "0") {
+                          setPayMethod("Efectivo")
+                        } else {
+                          setNequiValue(parseInt(e.target.value))
+                        }
+                      }}
+                      type="number"
+                      min={0}
+                      label="Total cliente"
+                      value={NequiValue}
+                      placeholder="Cantidad dada por el cliente"
+                      color="default"
+                      size="lg"
+                      className="font-bold py-2 rounded-lg px-2 text-xl border border-black text-black"
+                    />
+
+                  </> : null
+                }
+
               </ModalBody>
               <ModalFooter>
                 <Button

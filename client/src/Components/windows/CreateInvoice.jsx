@@ -64,12 +64,15 @@ export default function CreateInvoice() {
   }, [codigo]);
 
   useEffect(() => {
+    console.log(DBProducts)
+  }, [DBProducts])
+  
+
+  useEffect(() => {
       if(codeFully || inputDiscount){
         setglobalError(true)
-        console.log("error")
       }else {
         setglobalError(false)
-        console.log("noerror")
       }
   }, [codeFully, inputDiscount])
   
@@ -106,7 +109,6 @@ export default function CreateInvoice() {
             }
           }
         } catch (error) {
-          console.log(error)
           setCodeFully(true);
           if(nombreProducto.length > 1){
             setTimeout(() => {
@@ -116,7 +118,7 @@ export default function CreateInvoice() {
         }
       } else {
         const individualProduct = DBProducts.filter(
-          (p) => p.code === e.target.value
+          (p) => p.code === codigo
         )[0];
         if (individualProduct) {
           setisFilterBycode(true);
@@ -156,7 +158,6 @@ export default function CreateInvoice() {
         setinputDiscount(true);
         setInvoiceDiscont("");
       }
-      console.log("2");
     }
   }, [InvoiceDiscont, VerifyProductIn]);
 
@@ -184,10 +185,6 @@ export default function CreateInvoice() {
           descuento,
         };
 
-        console.log(
-          "Ganancia del producto: " +
-            (productToAdd.precio - productToAdd.precioCosto)
-        );
 
         setProductos([...productos, productToAdd]);
         resetInputsF();
@@ -201,6 +198,7 @@ export default function CreateInvoice() {
         const AddnewAmount = productos.filter((p) => {
           if (p.codigo === codigo) {
             p.cantidad = p.cantidad + cantidad;
+            p.descuento = descuento
           }
 
           return p;
@@ -267,10 +265,8 @@ export default function CreateInvoice() {
   };
 
   const eliminarProducto = (id, stock) => {
-    console.log(stock);
     const renewStock = DBProducts.filter((p) => {
       if (p._id === id) {
-        console.log(p.stock);
         p.stock = p.stock + stock;
       }
 
@@ -297,7 +293,7 @@ export default function CreateInvoice() {
         total: calcularTotal(),
         totalMoney: 0,
         date: formattedDate,
-        paymentMethod: null,
+        paymentMethod: null
       });
 
       onOpen();

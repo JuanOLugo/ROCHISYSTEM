@@ -41,7 +41,7 @@ function FindProductByName({ name, setters, refInput }) {
     return (
       <div
         ref={refContainer}
-        className={`absolute overflow-y-scroll bg-blue-500 text-white h-36 w-64 my-2   ${
+        className={`absolute overflow-y-scroll  bg-gray-800 border border-gray-700 focus:border-primary text-gray-200 h-40 w-72 my-2 rounded-md font-light  ${
           products.length == 0 || !handleFocus ? "hidden" : "block"
         }`}
       >
@@ -51,7 +51,7 @@ function FindProductByName({ name, setters, refInput }) {
                 <div
                   ref={refContainer}
                   key={i}
-                  className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
+                  className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-gray-800 transition-all"
                 >
                   <h1
                     className="w-full text-start cursor-pointer"
