@@ -34,3 +34,8 @@ export const GETPRODUCTBYCODE = async (data) => {
 export const GETPRODUCTBYNAME = async (data) => {
   return await axios.post(proxy + "getproductbyname", data);
 };
+
+
+export const GETPRODUCTBYSECTION = async (data) => {
+  return await axios.post(proxy + "getproductbysection", data);
+};

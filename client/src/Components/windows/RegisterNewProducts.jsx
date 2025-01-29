@@ -3,17 +3,15 @@ import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import {
   GetProductAPI,
+  GETPRODUCTBYCODE,
   UpdateProductsAPI,
 } from "../../Controllers/Product.controller";
+
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 
 export default function RegisterNewProducts() {
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [identificacionCliente, setIdentificacionCliente] = useState("");
-  const [nombreVendedor, setNombreVendedor] = useState("");
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [productFilterByName, setproductFilterByName] = useState([]);
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
@@ -23,44 +21,84 @@ export default function RegisterNewProducts() {
   const [isFilterBycode, setisFilterBycode] = useState(false);
   const [productos, setProductos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
-  const [DBProducts, setDBProducts] = useState(null);
+  const [DBProducts, setDBProducts] = useState([]);
   const [fullRegister, setFullRegister] = useState(null);
   const [GenerateTicked, setGenerateTicked] = useState(true);
   const [productExist, setproductExist] = useState(false);
-
-  useEffect(() => {
-    const data = new Promise((res, rej) => {
-      const data = GetProductAPI();
-      data ? res(data) : rej({ message: "Error" });
-    });
-    data
-      .then((data) => setDBProducts(data.data))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
-  }, []);
-
-  useEffect(() => {
-    if (productos.length > 0) {
-      window.addEventListener("beforeunload", () => {
-        if (productos.length > 0) {
-          const mensaje = "¿Estás seguro de que quieres salir?";
-          event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-        }
-      });
-
-      return () => {
-        window.removeEventListener("beforeunload", () => {
-          if (productos.length > 0) {
-            const mensaje = "¿Estás seguro de que quieres salir?";
-            event.returnValue = mensaje; // Para navegadores modernos return mensaje; // Para navegadores antiguos
-          }
-        });
-      };
-    }
-  }, [productos]);
+  const [codeFully, setCodeFully] = useState(false);
+  const [idIndividualProduct, setidIndividualProduct] = useState(null)
 
   const ref = useRef();
+
+  const resetInputsF = () => {
+    setCodigo("");
+    setisFilterBycode(false);
+    setNombreProducto("");
+    setprecioCosto("");
+    setprecioVenta("")
+    setidIndividualProduct(null);
+    setCantidad("");
+  };
+
+  const filterProductByCode = async (codigo) => {
+    if (codigo.length === 4 ) {
+      const verify = DBProducts.some((p) => p.code === codigo);
+      if (!verify) {
+        console.log("entre");
+        try {
+          const data = await GETPRODUCTBYCODE({ code: codigo });
+          const individualProduct = data.data.product;
+          if (data) {
+            const validation = DBProducts.some(
+              (p) => p.code === individualProduct.code
+            );
+            if (!validation) setDBProducts([...DBProducts, individualProduct]);
+            if (individualProduct) {
+              setisFilterBycode(true);
+              setNombreProducto(individualProduct.name);
+              setidIndividualProduct(individualProduct._id);
+              setprecioVenta(individualProduct.priceSell);
+              setprecioCosto(individualProduct.priceCost);
+              setCodeFully(false);
+            } else {
+              setisFilterBycode(false);
+            }
+          }
+        } catch (error) {
+          setCodeFully(true);
+          if (nombreProducto.length > 1) {
+            setTimeout(() => {
+              resetInputsF();
+            }, 500);
+          }
+        }
+      } else {
+        const individualProduct = DBProducts.filter(
+          (p) => p.code === codigo
+        )[0];
+        if (individualProduct) {
+          setisFilterBycode(true);
+          setNombreProducto(individualProduct.name);
+          setidIndividualProduct(individualProduct._id);
+          setprecioVenta(individualProduct.priceSell);
+          setprecioCosto(individualProduct.priceCost);
+          
+        } else {
+          setisFilterBycode(false);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+      if(!editandoId){
+        if (codigo.length < 4) {
+          setCodeFully(false);
+          setisFilterBycode(false);
+        } else filterProductByCode(codigo);
+      }
+
+  }, [codigo]);
 
   useEffect(() => {
     if (productos.length > 7) {
@@ -68,86 +106,105 @@ export default function RegisterNewProducts() {
     }
   }, [productos]);
 
-  useEffect(() => {
-    if (codigo) {
-      const verify = DBProducts.filter((p) => p.code === codigo);
-      if (verify.length > 0) {
-        setproductExist(true);
-      } else setproductExist(false);
-    }
-  }, [codigo]);
 
-  const agregarProducto = (e) => {
+
+  useEffect(() => {
+    console.log(productos)
+  }, [productos])
+  
+
+  const AddAndEditProducts = (e) => {
     e.preventDefault();
-    if (productExist) {
-      if (editandoId !== null) {
-        setProductos(
-          productos.map((p) =>
-            p.id === editandoId
-              ? {
-                  ...p,
-                  codigo,
-                  nombre: nombreProducto,
-                  precioCosto,
-                  precioVenta,
-                  cantidad,
-                  GenerateTicked,
-                }
-              : p
-          )
-        );
-        setEditandoId(null);
-        setisFilterBycode(false);
+    if (idIndividualProduct) {
+      if (!productos.some((p) => p.codigo === codigo)) {
+        const productToAdd = {
+          _id: idIndividualProduct,
+          id: +new Date(),
+          codigo,
+          precioVenta,
+          precioCosto,
+          cantidad,
+          nombre: nombreProducto,
+          GenerateTicked
+        };
+
+        setProductos([...productos, productToAdd]);
+        resetInputsF();
       } else {
-        setProductos([
-          ...productos,
-          {
-            id: Date.now(),
-            codigo,
-            nombre: nombreProducto,
-            precioCosto,
-            precioVenta,
-            cantidad,
-            GenerateTicked,
-          },
-        ]);
+        const AddnewAmount = productos.filter((p) => {
+          if (p.codigo === codigo) {
+            p.cantidad = p.cantidad + cantidad;
+            p.GenerateTicked = GenerateTicked
+            p.precioCosto = precioCosto
+            p.precioVenta = precioVenta
+            p.nombre = nombreProducto
+          }
+          return p;
+        });
+        setProductos(AddnewAmount);
+        resetInputsF();
       }
-      setCodigo("");
-      setNombreProducto("");
-      setprecioCosto("");
-      setprecioVenta("");
-      setCantidad("");
-      setisFilterBycode(false);
-      setGenerateTicked(true);
-    } else
-      toast.error(`El producto que intenta agregar no existe`, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
+    }
+
+    if (editandoId) {
+      const editingProducts = productos.filter((p) => {
+        if (p.id === editandoId) {
+          p.nombre = nombreProducto
+          p.precioCosto = parseInt(precioCosto)
+          p.cantidad = cantidad;
+          p.precioVenta = parseInt(precioVenta);
+          p.GenerateTicked = GenerateTicked
+        }
+        return p;
       });
+
+      
+
+      setProductos(editingProducts);
+      setEditandoId(null);
+      resetInputsF();
+    }
   };
 
   const editarProducto = (id) => {
-    const producto = productos.find((p) => p.id === id);
-    setisFilterBycode(true);
-    if (producto) {
-      setCodigo(producto.codigo);
-      setNombreProducto(producto.nombre);
-      setprecioCosto(producto.precioCosto);
-      setprecioVenta(producto.precioVenta);
-      setCantidad(producto.cantidad);
-      setEditandoId(id);
-      setGenerateTicked(producto.GenerateTicked);
-    }
+    const productFilter = productos.filter((p) => {
+      if (p.id === id) {
+        return p;
+      }
+    })[0];
+
+    const { cantidad, codigo, nombre, precioVenta, precioCosto, GenerateTicked} =
+      productFilter;
+
+      console.log(productFilter)
+    setCodigo(codigo);
+    setCantidad(cantidad);
+    setNombreProducto(nombre);
+    setprecioCosto(precioCosto);
+    setprecioVenta(precioVenta);
+    setGenerateTicked(GenerateTicked)
+    setEditandoId(id);
   };
 
-  const eliminarProducto = (id) => {
-    setProductos(productos.filter((p) => p.id !== id));
+  const eliminarProducto = (id, stock) => {
+    const renewStock = DBProducts.filter((p) => {
+      if (p._id === id) {
+        p.stock = p.stock + stock;
+      }
+
+      return p;
+    });
+    setDBProducts(renewStock);
+    setProductos(productos.filter((p) => p._id !== id));
+  };
+
+  const calcularTotal = () => {
+    return productos.reduce((total, producto) => {
+      return (
+        total +
+        producto.precio * producto.cantidad * (1 - producto.descuento / 100)
+      );
+    }, 0);
   };
 
   const guardarRegistro = async () => {
@@ -217,7 +274,7 @@ export default function RegisterNewProducts() {
           </h2>
           <form
             autoComplete="off"
-            onSubmit={agregarProducto}
+            onSubmit={AddAndEditProducts}
             className="grid grid-cols-1 md:grid-cols-5 gap-4"
           >
             <div>
@@ -228,25 +285,11 @@ export default function RegisterNewProducts() {
                 Código
               </label>
               <input
-              autoComplete="off"
+                autoComplete="off"
                 id="codigo"
                 type="text"
                 value={codigo}
-                onChange={(e) => {
-                  setCodigo(e.target.value);
-                  const filterProduct = DBProducts.filter(
-                    (product) => product.code == e.target.value
-                  );
-
-                  if (filterProduct[0]) {
-                    setNombreProducto(filterProduct[0].name);
-                    setisFilterBycode(true);
-                    setprecioCosto(filterProduct[0].priceCost);
-                    setprecioVenta(filterProduct[0].priceSell);
-                  } else {
-                    setisFilterBycode(false);
-                  }
-                }}
+                onChange={(e) => setCodigo(e.target.value)}
                 required
                 className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
@@ -263,9 +306,8 @@ export default function RegisterNewProducts() {
                 type="text"
                 value={nombreProducto}
                 onChange={(e) => {
-                  
                   setNombreProducto(e.target.value);
-                  const valuer = e.target.value.toLowerCase()
+                  const valuer = e.target.value.toLowerCase();
                   const productFilter = DBProducts.filter((p) =>
                     p.name.toLowerCase().includes(valuer)
                   );
@@ -296,7 +338,7 @@ export default function RegisterNewProducts() {
                             onClick={() => {
                               setCodigo(e.code);
                               setNombreProducto(e.name);
-                              setprecioCosto(e.priceCost)
+                              setprecioCosto(e.priceCost);
                               setprecioVenta(e.priceSell);
                               setproductFilterByName([]);
                             }}

@@ -12,14 +12,10 @@ function FindProductByName({ name, setters, refInput }) {
     }
   }, [name]);
 
-  useEffect(() => {
-    console.log(products);
-  }, [products]);
 
   useEffect(() => {
 
       const InputRef = refInput.current;
-      console.log(InputRef);
       InputRef.addEventListener("focus", () => {
         sethandleFocus(true);
 
@@ -33,10 +29,6 @@ function FindProductByName({ name, setters, refInput }) {
       });
   }, [refInput]);
 
-  useEffect(() => {
-    if (handleFocus) console.log("dentro");
-    else console.log("fuera")
-  }, [handleBlur]);
 
     return (
       <div
@@ -48,6 +40,7 @@ function FindProductByName({ name, setters, refInput }) {
         {products.length > 0
           ? products.map((e, i) => {
               return (
+                
                 <div
                   ref={refContainer}
                   key={i}
@@ -56,11 +49,10 @@ function FindProductByName({ name, setters, refInput }) {
                   <h1
                     className="w-full text-start cursor-pointer"
                     onClick={() => {
-                      console.log("a");
                       setters.setCodigo(e.code);
                       sethandleBlur(true);
                       sethandleFocus(false);
-                      setproducts([]);
+                      //setproducts([]);
                     }}
                   >
                     {e.name}

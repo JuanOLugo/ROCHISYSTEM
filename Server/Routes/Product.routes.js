@@ -6,7 +6,6 @@ const path = require("path");
 const { exec } = require("child_process");
 const converter = require("json-2-csv");
 
-
 //Code generator
 
 function generarCodigoUnico() {
@@ -15,10 +14,10 @@ function generarCodigoUnico() {
   // Los otros tres dígitos pueden ser cualquier número entre 0 y 9
   const siguienteDigitos = Math.floor(Math.random() * 1000); // Genera un número entre 000 y 999
   // Asegura que siempre tenga 3 dígitos, añadiendo ceros a la izquierda si es necesario
-  const codigo = primerDigito.toString() + siguienteDigitos.toString().padStart(3, '0');
+  const codigo =
+    primerDigito.toString() + siguienteDigitos.toString().padStart(3, "0");
   return codigo;
 }
-
 
 pRouter.post("/create", async (req, res) => {
   const { codigo, nombre, PrecioCosto, Precioventa, proveedor, stock } =
@@ -138,47 +137,88 @@ pRouter.get("/getproductcode", async (req, res) => {
   //Get all products
 
   const products = await product.find();
-  let codeGen = generarCodigoUnico().toString()
+  let codeGen = generarCodigoUnico().toString();
   const productExist = products.map((p) => {
-    
     while (products.some((p) => p.code === codeGen)) {
-      codeGen = generarCodigoUnico().toString()
-      console.log("igual")
-    } 
+      codeGen = generarCodigoUnico().toString();
+      console.log("igual");
+    }
   });
 
-  if(codeGen){
-    
-    res.status(200).send({code: codeGen})
+  if (codeGen) {
+    res.status(200).send({ code: codeGen });
   }
 });
 
 pRouter.post("/getproductbycode", async (req, res) => {
   //Get all products
-  const {code} = req.body
-  console.log(code)
-  const productFilter = await product.findOne({code: code});
+  const { code } = req.body;
+  console.log(code);
+  const productFilter = await product.findOne({ code: code });
 
-  if(productFilter){
-    res.status(200).send({product: productFilter})
-  } else res.status(400).send({message: "No se encontro producto"})
-
+  if (productFilter) {
+    res.status(200).send({ product: productFilter });
+  } else res.status(400).send({ message: "No se encontro producto" });
 });
 
 pRouter.post("/getproductbyname", async (req, res) => {
   //Get all products
-  let {name} = req.body
-  name = name.toLowerCase()
+  let { name } = req.body;
+  name = name.toLowerCase();
   const products = await product.find();
-  
-  const productsFilter = products.filter(p => {
-    if(p.name.toLowerCase().includes(name)) return p
-  })
-  console.log(productsFilter)
-  if(productsFilter){
-    res.status(200).send({product: productsFilter})
-  } else res.status(400).send({message: "No se encontro producto"})
 
+  const productsFilter = products.filter((p) => {
+    if (p.name.toLowerCase().includes(name)) return p;
+  });
+  console.log(productsFilter);
+  if (productsFilter) {
+    res.status(200).send({ product: productsFilter });
+  } else res.status(400).send({ message: "No se encontro producto" });
+});
+
+pRouter.post("/getproductbysection", async (req, res) => {
+  //Get all products
+  let { pageNum, pageSize, codeFilter, nameFilter } = req.body;
+
+  const products = await product.find();
+  const info = {
+    pageNum,
+    pageSize,
+    productsSize: products.length,
+  };
+
+  let arrayProducts;
+
+  if (codeFilter) {
+    arrayProducts = products.filter((p) => p.code.includes(codeFilter));
+    arrayProducts = arrayProducts.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize
+    );
+  } else if (nameFilter) {
+    arrayProducts = products.filter((p) => p.name.toLowerCase().includes(nameFilter.toLowerCase()));
+    arrayProducts = arrayProducts.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize
+    );
+  } else {
+    arrayProducts = products.slice(
+      (pageNum - 1) * pageSize,
+      pageNum * pageSize
+    );
+
+    
+  }
+
+  let final;
+
+  if(arrayProducts.length > pageSize - 1){
+    final = false
+  }else final = true
+
+  if (arrayProducts.length > 0) {
+    res.status(200).send({ products: arrayProducts, info: {...info, final}  });
+  } else res.status(400).send({ message: "No hay productos", info: {...info, final} });
 });
 
 module.exports = pRouter;

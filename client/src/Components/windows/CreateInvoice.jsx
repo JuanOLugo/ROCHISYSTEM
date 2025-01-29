@@ -1,15 +1,16 @@
-import { useBadge, useDisclosure } from "@nextui-org/react";
+import {useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import {
-  GetProductAPI,
   GETPRODUCTBYCODE,
 } from "../../Controllers/Product.controller";
+
 import { format } from "date-fns";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import FindProductByName from "../Insertions/FindProductByName";
+import InvoiceTable from "../Insertions/invoiceTable";
 export default function CreateInvoice() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const date = new Date();
@@ -31,11 +32,11 @@ export default function CreateInvoice() {
   const [DiscontSection, setDiscontSection] = useState(false);
   const [VerifyProductIn, setVerifyProductIn] = useState(0);
   const [globalError, setglobalError] = useState(false)
-  const refScroll = useRef(null);
+ 
   const refInputPN = useRef(null);
 
   //Reset Input Functions
-  const resetInputsF = () => {
+   const resetInputsF = () => {
     setCodigo("");
     setisFilterBycode(false);
     setNombreProducto("");
@@ -59,29 +60,19 @@ export default function CreateInvoice() {
       setisFilterBycode(false)
       
     }else filterProductByCode(codigo)
-
-
   }, [codigo]);
 
-  useEffect(() => {
-    console.log(DBProducts)
-  }, [DBProducts])
   
-
   useEffect(() => {
-      if(codeFully || inputDiscount){
+      if(codeFully ){
         setglobalError(true)
       }else {
         setglobalError(false)
       }
+
   }, [codeFully, inputDiscount])
   
-  //AutoScrollTop
-  useEffect(() => {
-    if (productos.length > 9) {
-      refScroll.current.scrollTop = refScroll.current.scrollHeight;
-    }
-  }, [productos]);
+
 
   //Filtrar producto por codigo
 
@@ -162,6 +153,9 @@ export default function CreateInvoice() {
   }, [InvoiceDiscont, VerifyProductIn]);
 
   //Agregar productos a la factura
+
+
+  
 
   const AddAndEditProducts = (e) => {
     e.preventDefault();
@@ -450,7 +444,7 @@ export default function CreateInvoice() {
             <div className="md:col-span-5">
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-1  px-4  hover:bg-primary-dark transition duration-300"
+                className="w-full  bg-gray-700 text-primary-foreground py-1  px-4  hover:bg-primary-dark transition duration-300"
               >
                 {editandoId !== null
                   ? "Actualizar Producto"
@@ -460,88 +454,8 @@ export default function CreateInvoice() {
           </form>
         </div>
 
-        <div className=" px-5 ">
-          <h2 className="text-xl font-semibold mb-2 text-gray-200 my-2">
-            Productos en la Factura
-          </h2>
-          <div
-            className="overflow-x-auto overflow-scroll h-72 border rounded-sm bg-gray-900  "
-            ref={refScroll}
-          >
-            <table className="min-w-full divide-y divide-gray-200 ">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Código
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Nombre
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Precio
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Descuento
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Cantidad
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs lg:text-base font-normal border border-gray-200 text-gray-200 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y  divide-gray-200 ">
-                {productos.map((producto) => (
-                  <tr key={producto.id} className="border-b-1 border-gray-200">
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
-                      {producto.codigo}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
-                      {producto.nombreProducto}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
-                      ${producto.precio.toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base  font-normal border border-gray-800">
-                      {producto.descuento}%
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800">
-                      {producto.cantidad}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs lg:text-base font-normal border border-gray-800 ">
-                      $
-                      {(
-                        producto.precio *
-                        producto.cantidad *
-                        (1 - producto.descuento / 100)
-                      ).toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap border text-xs lg:text-base border-gray-800  font-normal">
-                      <button
-                        onClick={() => editarProducto(producto.id)}
-                        className="text-indigo-600 text-xs lg:text-base hover:text-indigo-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() =>
-                          eliminarProducto(producto._id, producto.cantidad)
-                        }
-                        className="text-red-600 text-xs lg:text-base  hover:text-red-900"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
+       <div className="px-5">
+       <InvoiceTable productos={productos} eliminarProducto={eliminarProducto} editarProducto={editarProducto} />
           <div className="mt-3 flex justify-between items-center">
             <span className="text-xl font-normal text-gray-200">
               Total: ${calcularTotal().toLocaleString("es-co")}

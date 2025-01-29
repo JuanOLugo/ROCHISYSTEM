@@ -21,7 +21,7 @@ iRouter.post("/create", async (req, res) => {
         _id: _id,
         code: code,
         name: name,
-        priceSell: priceSell,
+        priceSell: e.precio,
         priceCost: priceCost,
         amount: e.cantidad,
         discount: e.descuento,

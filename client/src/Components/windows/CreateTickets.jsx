@@ -30,9 +30,7 @@ export default function CreateTickets() {
     });
     data
       .then((data) => setDBProducts(data.data))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
+      .catch((err) => {throw new Error(err.response.data.message)});
   }, []);
 
   const ref = useRef();

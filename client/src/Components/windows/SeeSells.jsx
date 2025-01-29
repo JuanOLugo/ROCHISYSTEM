@@ -12,6 +12,8 @@ import {
   Input,
   useDisclosure,
 } from "@nextui-org/react";
+
+import { FaEye, FaTrashAlt } from "react-icons/fa";
 import { format } from "date-fns";
 import {
   DeleteInvoiceAPI,
@@ -19,6 +21,8 @@ import {
   VERIFYTOTALWINDAY,
 } from "../../Controllers/Invoice.controller";
 import Invoice from "../Modals/Invoice";
+import FinantialResume from "../Insertions/FinantialResume";
+import InputDate from "../Insertions/InputDate";
 
 export default function SeeSells() {
   const date = new Date();
@@ -26,22 +30,22 @@ export default function SeeSells() {
   const [facturas, setFacturas] = useState([]);
   const [filtro, setFiltro] = useState(formattedDate);
   const [invoiceToSee, setinvoiceToSee] = useState([]);
-  const [totalWinDay, settotalWinDay] = useState(0)
+  const [totalWinDay, settotalWinDay] = useState(0);
   useEffect(() => {
     const data = GetInvoiceAPI({ date: filtro });
-    const totalWinning = VERIFYTOTALWINDAY({ date: filtro })
+    const totalWinning = VERIFYTOTALWINDAY({ date: filtro });
 
     data
       .then((data) => setFacturas(data.data.invoices))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
+      .catch((err) => {
+        throw new Error("Recuerda que: " + err.response.data.message);
+      });
 
-      totalWinning
+    totalWinning
       .then((data) => settotalWinDay(data.data.totalWinning))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
+      .catch((err) => {
+        throw new Error("Recuerda que: " + err.response.data.message);
+      });
   }, [filtro]);
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -54,12 +58,11 @@ export default function SeeSells() {
     .filter((factura) => factura.payMethod === "Nequi")
     .reduce((sum, factura) => {
       if (factura.totalNequi) {
-          return sum + factura.totalNequi; // Suma totalNequi si existe
+        return sum + factura.totalNequi; // Suma totalNequi si existe
       } else {
-          return sum + factura.totalInvoice; // Suma totalInvoice si totalNequi no existe
+        return sum + factura.totalInvoice; // Suma totalInvoice si totalNequi no existe
       }
-  }, 0);
-
+    }, 0);
 
   const eliminarFactura = (id) => {
     const promt = prompt("Contraseña");
@@ -70,81 +73,91 @@ export default function SeeSells() {
   };
 
   return (
-    <div className="container mx-auto p-4 font-bold">
-      <Input
-        type="date"
-        label="Filtrar por fecha"
+    <div className="container mx-auto p-4 font-bold min-h-screen ">
+      <InputDate
+        label={"Fecha de facturas"}
+        onChange={setFiltro}
         value={filtro}
-        onChange={(e) => setFiltro(e.target.value)}
-        className="mb-4 w-52"
       />
-      <Table aria-label="Tabla de Facturas" className="h-96">
-        <TableHeader>
-          <TableColumn className="font-bold">ID</TableColumn>
-          <TableColumn className="font-bold">FECHA</TableColumn>
-          <TableColumn className="font-bold">VENDEDOR</TableColumn>
-          <TableColumn className="font-bold">TOTAL</TableColumn>
-          <TableColumn className="font-bold">MÉTODO DE PAGO</TableColumn>
-          <TableColumn className="font-bold">ACCIONES</TableColumn>
-        </TableHeader>
-        <TableBody className="font-bold">
-          {facturas.map((factura) => (
-            <TableRow key={factura._id}>
-              <TableCell className="border border-blue-500 font-bold  ">
-                {factura._id}
-              </TableCell>
-              <TableCell className="border border-blue-500 font-bold ">
-                {factura.date}
-              </TableCell>
-              <TableCell className="border border-blue-500 font-bold ">
-                {factura.sellerName}
-              </TableCell>
-              <TableCell className="border border-blue-500 font-bold ">
-                ${factura.totalInvoice.toLocaleString("es-CO")}
-              </TableCell>
-              <TableCell className="border border-blue-500 font-bold ">
-                {factura.payMethod}
-              </TableCell>
-              <TableCell className="border border-blue-500 font-bold ">
-                <Button
-                  color="danger"
-                  auto
-                  className="mx-2"
-                  onClick={() => eliminarFactura(factura._id)}
-                >
-                  Anular
-                </Button>
-                <Button
-                  color="primary"
-                  auto
-                  onClick={() => {
-                    setinvoiceToSee(factura);
-                    onOpen();
-                  }}
-                >
-                  Ver
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <Card className="mt-4 ">
-        <CardBody className="flex">
-          <h1>Total de Ventas: ${totalVentas.toLocaleString("es-co")}</h1>
-          <h1>
-            Total de Ventas por Nequi: ${totalNequi.toLocaleString("es-co")}
-          </h1>
-          <h1>Total Ganancias Netas: ${totalWinDay.toLocaleString("es-co")}</h1>
-        </CardBody>
-      </Card>
-      <Invoice
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onOpenChange={onOpenChange}
-        data={invoiceToSee}
-        setData={setinvoiceToSee}
-      />
+      <div className="h-96 overflow-y-scroll ">
+        <table className="min-w-full bg-gray-800 border border-gray-700  ">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                ID
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                Fecha
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                Vendedor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                Total
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                Metodo de pago
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+                Acciones
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700  ">
+            {facturas.map((factura) => (
+              <tr key={factura._id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">
+                  {factura._id}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                  {factura.date}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                  {factura.sellerName}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-200">
+                  ${factura.totalInvoice.toLocaleString("es-CO")}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200 font-bold">
+                  {factura.payMethod}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                  <button
+                    onClick={() => eliminarFactura(factura._id)}
+                    className="text-red-500 hover:text-red-700 mr-2"
+                  >
+                    <FaTrashAlt className="text-xl" />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setinvoiceToSee(factura);
+                      onOpen();
+                    }}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
+                    <FaEye className="text-xl" />
+                  </button>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        </div>
+        <FinantialResume
+          totalSales={totalVentas}
+          totalNequiPayments={totalNequi}
+          totalProfit={totalWinDay}
+        />
+        <Invoice
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onOpenChange={onOpenChange}
+          data={invoiceToSee}
+          setData={setinvoiceToSee}
+        />
+      
     </div>
   );
 }

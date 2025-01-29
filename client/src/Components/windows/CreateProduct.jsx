@@ -31,7 +31,7 @@ export default function CreateProduct() {
       const data = await GETPRODUCTCODE();
       setCodigo(data.data.code);
     } catch (error) {
-      console.log(error);
+      throw new Error(error.message);
     }
   };
 

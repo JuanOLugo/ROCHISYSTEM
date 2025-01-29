@@ -1,61 +1,19 @@
 import { useState, useCallback, useEffect } from "react";
 import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@nextui-org/react";
-import { Input, Button } from "@nextui-org/react";
-import { FaTrashAlt } from "react-icons/fa";
-import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
-import {
   DeleteProductAPI,
-  GetProductAPI,
+  GETPRODUCTBYSECTION,
 } from "../../Controllers/Product.controller";
-import { ToastContainer, toast } from "react-toastify";
-
-import "react-toastify/dist/ReactToastify.css";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import TableProducts from "../Insertions/TableProducts";
 
 export default function ListProduct() {
   const [products, setProducts] = useState([]);
   const [codeFilter, setcodeFilter] = useState("");
   const [nameFilter, setnameFilter] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
   const [productspaginate, setproductspaginate] = useState([]);
   const [pageNum, setpageNum] = useState(1);
   const [pageSize, setpageSize] = useState(10);
-
-  useEffect(() => {
-    const data = new Promise(res => res(GetProductAPI()));
-    toast.promise(
-      data,
-      {
-        pending: "Obteniendo los productos...",
-        success: "Productos obtenidos 👌",
-        error: "Error al obtener los productos 🤯",
-      },
-      {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      }
-    );
-    data
-      .then((data) => setProducts(data.data))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
-  }, []);
-
+const [errorPagination, seterrorPagination] = useState(false)
   const handleDelete = useCallback(async (id) => {
     DeleteProductAPI({ id });
     setProducts((products) => products.filter((product) => product._id !== id));
@@ -65,69 +23,82 @@ export default function ListProduct() {
   }, []);
 
   useEffect(() => {
-    if (codeFilter.length > 0 || nameFilter.length > 0) {
-      const productsToPaginate = products.filter((product) => {
-        const matchesName = product.code
-          .toLowerCase()
-          .includes(codeFilter.toLowerCase());
-        const matchesnameFilter = product.name
-          .toLowerCase()
-          .includes(nameFilter.toLowerCase());
-        return matchesName && matchesnameFilter;
-      })
+    if (codeFilter.length > 0) {
+      try {
+        GETPRODUCTBYSECTION({ pageNum: 1, pageSize, codeFilter }).then((res) =>
+          setproductspaginate(res.data.products)
+        );
+      } catch (error) {
+        GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>
+          setproductspaginate(res.data.products)
+        );
+      }
+    }
 
-      setproductspaginate(paginacion(productsToPaginate, pageSize, pageNum)
+    if (nameFilter.length > 0) {
+      try {
+        GETPRODUCTBYSECTION({ pageNum: 1, pageSize, nameFilter }).then((res) =>
+          setproductspaginate(res.data.products)
+        );
+      } catch (error) {
+        GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>
+          setproductspaginate(res.data.products)
+        );
+      }
+    }
+
+    if (nameFilter.length === 0 && codeFilter.length === 0) {
+      GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>
+        setproductspaginate(res.data.products)
       );
-    } else {
-      setproductspaginate(paginacion(products, 10, 1));
-      
     }
   }, [codeFilter, nameFilter]);
 
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
   //paginacion
-
-  const paginacion = (array, page_size, page_number) => {
-    return array.slice((page_number - 1) * page_size, page_number * page_size);
-  };
-
   useEffect(() => {
-    setproductspaginate(paginacion(products, pageSize, pageNum));
-  }, [products, pageNum, pageSize]);
+    GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>{
+      seterrorPagination(false)
+      setproductspaginate(res.data.products)
+    }
+    ).catch(err => {
+      setpageNum(pageNum - 1)
+      seterrorPagination(true)
+    })
+  }, [pageNum, pageSize]);
 
   return (
-    <div className="container mx-auto p-4">
-      <ToastContainer containerId={11} />
+    <div className=" p-4 bg-gray-900 h-full min-h-screen">
       <div className="mb-4 flex flex-wrap gap-4">
-        <Input
+        <input
           clearable
           label="Filtrar por codigo"
           placeholder="Filtrar por codigo"
           value={codeFilter}
+          maxLength={4}
           onChange={(e) => setcodeFilter(e.target.value)}
-          className="max-w-xs"
+          className="max-w-xs text-gray-200 bg-gray-800 border px-3 py-2 border-gray-700 focus:border-primary "
         />
-        <Input
+        <input
           clearable
           type="text"
           label="Nombre de producto"
           placeholder="Nombre de producto"
           value={nameFilter}
           onChange={(e) => setnameFilter(e.target.value)}
-          className="max-w-xs"
+          className="max-w-xs text-gray-200 bg-gray-800 border px-3 py-2 border-gray-700 focus:border-primary"
         />
       </div>
+
       <div>
-        <h1 className="text-sm font-bold">Productos a mostrar por pagina</h1>
+        <h1 className="text-sm font-bold text-white">
+          Productos a mostrar por pagina
+        </h1>
         <div className="flex py-2 my-1">
           <button
             className={`mx-1 text-sm p-1 ${
               pageSize === 10
                 ? "bg-gray-500 opacity-50   rounded-md text-white font-bold"
-                : "bg-blue-600   rounded-md text-white font-bold"
+                : "bg-gray-800    rounded-md text-white font-bold"
             }`}
             onClick={() => {
               if (products.length > 9) {
@@ -152,7 +123,7 @@ export default function ListProduct() {
             className={`mx-1 text-sm p-1 ${
               pageSize === 50
                 ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
-                : "bg-blue-600   rounded-md text-white font-bold"
+                : "bg-gray-800    rounded-md text-white font-bold"
             }`}
           >
             50
@@ -169,75 +140,16 @@ export default function ListProduct() {
             className={`mx-1 text-sm p-1 ${
               pageSize === 100
                 ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
-                : "bg-blue-600   rounded-md text-white font-bold"
+                : "bg-gray-800    rounded-md text-white font-bold"
             }`}
           >
             100
           </button>
         </div>
       </div>
-      <Table
-        aria-label="Tabla de productos"
-        css={{
-          height: "auto",
-          minWidth: "100%",
-        }}
-        className="h-[450px]"
-      >
-        <TableHeader>
-          <TableColumn className=" font-bold ">Código</TableColumn>
-          <TableColumn className=" font-bold ">Nombre</TableColumn>
-          <TableColumn className=" flex items-center font-bold ">
-            <h1 className="flex ">Precio Costo </h1>
-          </TableColumn>
-          <TableColumn className=" font-bold ">
-            <h1 className="flex">Precio Venta </h1>
-          </TableColumn>
-          <TableColumn className=" font-bold ">Proveedor</TableColumn>
-          <TableColumn className=" font-bold ">Stock</TableColumn>
-          <TableColumn className=" font-bold ">Acciones</TableColumn>
-        </TableHeader>
-        <TableBody className="border rounded-lg">
-          {productspaginate.map((product) => (
-            <TableRow key={product._id} className="">
-              <TableCell className="border border-blue-600 font-bold ">
-                {product.code}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                {product.name}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                ${product.priceCost.toLocaleString("es-co")}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                ${product.priceSell.toLocaleString("es-co")}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                {product.supplier}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                {product.stock}
-              </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                <Button
-                  color="error"
-                  auto
-                  onClick={() => handleDelete(product._id)}
-                >
-                  <div className="bg-red-500 p-2 rounded-xl">
-                    <FaTrashAlt className="text-xl text-white" />
-                  </div>
-                </Button>
-                <Button
-                  color="error"
-                  auto
-                  onClick={() => handleDelete(product._id)}
-                ></Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="overflow-x-auto">
+        <TableProducts productspaginate={productspaginate} handleDelete={handleDelete} />
+      </div>
       <div className="flex justify-center items-center my-5 ">
         <button
           onClick={() => {
@@ -248,16 +160,16 @@ export default function ListProduct() {
             }
           }}
           className={`${
-            pageNum > 1 ? "bg-blue-600" : "bg-gray-500 opacity-50"
+            pageNum > 1 ? "bg-gray-800 " : "bg-gray-400 opacity-50"
           } p-2 text-white rounded-md `}
         >
           <FaChevronLeft />
         </button>
-        <h1 className="mx-4 font-bold">{pageNum}</h1>
+        <h1 className="mx-4 font-bold text-gray-200">{pageNum}</h1>
         <button
           className={` ${
             productspaginate.length === pageSize
-              ? "bg-blue-600"
+              ? "bg-gray-800 "
               : "bg-gray-500 opacity-50"
           } p-2 text-white rounded-md `}
           onClick={() => {
