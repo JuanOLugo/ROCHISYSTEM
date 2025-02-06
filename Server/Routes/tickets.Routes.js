@@ -8,9 +8,7 @@ const { exec } = require("child_process");
 trouter.post("/generateticket", async (req, res) => {
   const { productos } = req.body;
 
-  if (productos.length > 0) {
-    try {
-      const FileName = "registro.csv";
+  const FileName = "registro.csv";
       const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
       fs.writeFileSync(
         rutaDirectorio,
@@ -19,16 +17,22 @@ trouter.post("/generateticket", async (req, res) => {
           return csv;
         })
       );
-      exec("bartend", (err, data) => {
-        console.log(err);
-        console.log(data.toString());
-      });
-      res.status(200).send({ message: "CSV CREADO" });
-    } catch (error) {
-      res.status(400).send({ message: "ERROR BARTENDER" });
-      console.log(error);
-    }
-  }
+
+  const executeCommand = new Promise((resolve, reject) => {
+    exec("bartend", (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+  const response = await executeCommand.catch((error) => {
+    return error;
+  });
+  if (response) return res.status(400).send("Error al ejecutar el comando desde el servidor | Contactar al desarrollador");
+  else return res.status(200).send("Mensaje enviado correctamente");
+
 });
 
 module.exports = trouter;

@@ -9,6 +9,9 @@ import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import { GenerateTicketsAPI } from "../../Controllers/Tickets.controller";
+import TicketsTable from "../Insertions/TicketsTable";
+import AddToTabe from "../Insertions/AddToTabe";
+import TitleForTables from "../Insertions/TitleForTables";
 
 export default function CreateTickets() {
   const [productFilterByName, setproductFilterByName] = useState([]);
@@ -30,7 +33,9 @@ export default function CreateTickets() {
     });
     data
       .then((data) => setDBProducts(data.data))
-      .catch((err) => {throw new Error(err.response.data.message)});
+      .catch((err) => {
+        throw new Error(err.response.data.message);
+      });
   }, []);
 
   const ref = useRef();
@@ -87,7 +92,7 @@ export default function CreateTickets() {
       setprecioVenta("");
       setCantidad("");
       setisFilterBycode(false);
-      refFocus.current.focus()
+      refFocus.current.focus();
     } else
       toast.error(`El producto que intenta agregar no existe`, {
         position: "bottom-right",
@@ -175,22 +180,20 @@ export default function CreateTickets() {
   };
 
   return (
-    <div className="container mx-auto my-5">
+    <div className="bg-gray-900 h-screen grid">
       <ToastContainer containerId={10} />
-      <div className="space-y-2">
-        <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
-            Generar Tickets
-          </h2>
+      <div>
+        <div className="px-5">
+        <TitleForTables Label={"Generador"} />
           <form
-          autoComplete="off"
+            autoComplete="off"
             onSubmit={agregarProducto}
-            className="grid grid-cols-1 md:grid-cols-5  gap-4"
+            className="grid grid-cols-1  md:grid-cols-5 gap-2"
           >
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Código
               </label>
@@ -214,13 +217,13 @@ export default function CreateTickets() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Nombre del Producto
               </label>
@@ -241,7 +244,7 @@ export default function CreateTickets() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
 
               <div
@@ -276,7 +279,7 @@ export default function CreateTickets() {
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Cantidad
               </label>
@@ -286,95 +289,25 @@ export default function CreateTickets() {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
-            <div className="md:col-span-5">
-              <button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground py-1  px-4 rounded-md hover:bg-primary-dark transition duration-300"
-              >
-                {editandoId !== null
-                  ? "Actualizar Producto"
-                  : "Agregar Producto Registrado"}
-              </button>
-            </div>
+            <AddToTabe editandoId={editandoId} label={"Agregar Producto para generar"}/>
           </form>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg px-3 py-1">
-          <h2 className="text-xl font-semibold mb-2 text-primary">
-            Productos ingresados
-          </h2>
-          <div className="overflow-x-auto overflow-scroll h-52" ref={ref}>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                <th className="px-1 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                   Numero
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Código
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Nombre
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Precio Venta
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Cantidad Tickets
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {productos.map((producto, i) => (
-                  <tr key={i}>
-                    <td className="px-1 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {i + 1}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.codigo}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.nombre}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      ${producto.precioVenta.toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.cantidad}
-                    </td>
-                    <td className="px-6 py-1 border border-black text-xs whitespace-nowrap  font-bold">
-                      <button
-                        onClick={() => editarProducto(producto.id)}
-                        className="text-indigo-600 text-xs hover:text-indigo-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => eliminarProducto(producto.id)}
-                        className="text-red-600 text-xs hover:text-red-900"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-6 flex justify-between items-center">
-            <button
-              onClick={guardarRegistro}
-              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
-            >
-              Guardar registro
-            </button>
-          </div>
+        <TicketsTable
+          eliminarProducto={eliminarProducto}
+          productos={productos}
+          guardarRegistro={guardarRegistro}
+        />
+        <div className="ml-5 mt-6 flex justify-between items-center">
+          <button
+            onClick={guardarRegistro}
+            className=" text-white py-1  px-4  bg-emerald-500 hover:bg-emerald-400 transition duration-300 border border-emerald-900"
+          >
+            Guardar registro
+          </button>
         </div>
       </div>
     </div>

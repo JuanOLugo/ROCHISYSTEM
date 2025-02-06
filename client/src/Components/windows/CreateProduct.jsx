@@ -131,7 +131,7 @@ export default function CreateProduct() {
     if (ProductIs === "new") {
       setStock("");
     } else if (ProductIs === "old") {
-      setStock(prevStock => prevStock || 0);
+      setStock(prevStock => prevStock || "");
     }
   }, [ProductIs]);
 

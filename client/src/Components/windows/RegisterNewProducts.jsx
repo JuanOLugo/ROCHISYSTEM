@@ -1,6 +1,4 @@
-import { useDisclosure } from "@nextui-org/react";
 import React, { useEffect, useRef, useState } from "react";
-import FinishInvoice from "../Modals/FinishInvoice";
 import {
   GetProductAPI,
   GETPRODUCTBYCODE,
@@ -10,6 +8,10 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
+import RegisterPTable from "../Insertions/RegisterPTable";
+import FindProductByName from "../Insertions/FindProductByName";
+import AddToTabe from "../Insertions/AddToTabe";
+import TitleForTables from "../Insertions/TitleForTables";
 
 export default function RegisterNewProducts() {
   const [productFilterByName, setproductFilterByName] = useState([]);
@@ -26,22 +28,22 @@ export default function RegisterNewProducts() {
   const [GenerateTicked, setGenerateTicked] = useState(true);
   const [productExist, setproductExist] = useState(false);
   const [codeFully, setCodeFully] = useState(false);
-  const [idIndividualProduct, setidIndividualProduct] = useState(null)
+  const [idIndividualProduct, setidIndividualProduct] = useState(null);
 
   const ref = useRef();
-
+  const refInputPN = useRef();
   const resetInputsF = () => {
     setCodigo("");
     setisFilterBycode(false);
     setNombreProducto("");
     setprecioCosto("");
-    setprecioVenta("")
+    setprecioVenta("");
     setidIndividualProduct(null);
     setCantidad("");
   };
 
   const filterProductByCode = async (codigo) => {
-    if (codigo.length === 4 ) {
+    if (codigo.length === 4) {
       const verify = DBProducts.some((p) => p.code === codigo);
       if (!verify) {
         console.log("entre");
@@ -82,7 +84,6 @@ export default function RegisterNewProducts() {
           setidIndividualProduct(individualProduct._id);
           setprecioVenta(individualProduct.priceSell);
           setprecioCosto(individualProduct.priceCost);
-          
         } else {
           setisFilterBycode(false);
         }
@@ -91,13 +92,12 @@ export default function RegisterNewProducts() {
   };
 
   useEffect(() => {
-      if(!editandoId){
-        if (codigo.length < 4) {
-          setCodeFully(false);
-          setisFilterBycode(false);
-        } else filterProductByCode(codigo);
-      }
-
+    if (!editandoId) {
+      if (codigo.length < 4) {
+        setCodeFully(false);
+        setisFilterBycode(false);
+      } else filterProductByCode(codigo);
+    }
   }, [codigo]);
 
   useEffect(() => {
@@ -106,12 +106,9 @@ export default function RegisterNewProducts() {
     }
   }, [productos]);
 
-
-
   useEffect(() => {
-    console.log(productos)
-  }, [productos])
-  
+    console.log(productos);
+  }, [productos]);
 
   const AddAndEditProducts = (e) => {
     e.preventDefault();
@@ -125,7 +122,7 @@ export default function RegisterNewProducts() {
           precioCosto,
           cantidad,
           nombre: nombreProducto,
-          GenerateTicked
+          GenerateTicked,
         };
 
         setProductos([...productos, productToAdd]);
@@ -134,10 +131,10 @@ export default function RegisterNewProducts() {
         const AddnewAmount = productos.filter((p) => {
           if (p.codigo === codigo) {
             p.cantidad = p.cantidad + cantidad;
-            p.GenerateTicked = GenerateTicked
-            p.precioCosto = precioCosto
-            p.precioVenta = precioVenta
-            p.nombre = nombreProducto
+            p.GenerateTicked = GenerateTicked;
+            p.precioCosto = precioCosto;
+            p.precioVenta = precioVenta;
+            p.nombre = nombreProducto;
           }
           return p;
         });
@@ -149,16 +146,14 @@ export default function RegisterNewProducts() {
     if (editandoId) {
       const editingProducts = productos.filter((p) => {
         if (p.id === editandoId) {
-          p.nombre = nombreProducto
-          p.precioCosto = parseInt(precioCosto)
+          p.nombre = nombreProducto;
+          p.precioCosto = parseInt(precioCosto);
           p.cantidad = cantidad;
           p.precioVenta = parseInt(precioVenta);
-          p.GenerateTicked = GenerateTicked
+          p.GenerateTicked = GenerateTicked;
         }
         return p;
       });
-
-      
 
       setProductos(editingProducts);
       setEditandoId(null);
@@ -173,16 +168,22 @@ export default function RegisterNewProducts() {
       }
     })[0];
 
-    const { cantidad, codigo, nombre, precioVenta, precioCosto, GenerateTicked} =
-      productFilter;
+    const {
+      cantidad,
+      codigo,
+      nombre,
+      precioVenta,
+      precioCosto,
+      GenerateTicked,
+    } = productFilter;
 
-      console.log(productFilter)
+    console.log(productFilter);
     setCodigo(codigo);
     setCantidad(cantidad);
     setNombreProducto(nombre);
     setprecioCosto(precioCosto);
     setprecioVenta(precioVenta);
-    setGenerateTicked(GenerateTicked)
+    setGenerateTicked(GenerateTicked);
     setEditandoId(id);
   };
 
@@ -211,76 +212,72 @@ export default function RegisterNewProducts() {
     // Aquí iría la lógica para guardar la factura
     if (productos.length > 0) {
       try {
-        const response = await UpdateProductsAPI({ productos });
-        if (response.status === 400) {
-          toast.warning(
-            `Error con BARTENDER, comuniquese con el desarrollador`,
-            {
-              position: "bottom-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "dark",
-            }
-          );
-        } else {
-          toast.success("Registrados correctamente", {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
-          setProductos([]);
-        }
-      } catch (error) {
-        toast.error(error, {
+        await UpdateProductsAPI({ productos });
+        toast.success("Productos registrados correctamente", {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
-          closeOnClick: true,
+          closeOnClick: false,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
           theme: "dark",
+          
+        });
+        setProductos([]);
+      } catch (error) {
+        toast.error(error.response.data, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          
         });
       }
     } else
-      toast.warning("No hay productos que registrar", {
+      toast.warning("No hay productos que facturar", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
         theme: "dark",
+        
       });
   };
 
   return (
-    <div className="container mx-auto my-5">
-      <ToastContainer containerId={10} />
-      <div className="space-y-2">
-        <div className="bg-white shadow-lg sticky top-0 rounded-lg  p-2">
-          <h2 className="text-xl font-semibold mb-4 text-primary">
-            Actualizar producto
-          </h2>
+    <div className="bg-gray-900 h-screen grid">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      <div>
+        <div className=" px-5">
+          <TitleForTables Label={"Registro"} />
           <form
             autoComplete="off"
             onSubmit={AddAndEditProducts}
-            className="grid grid-cols-1 md:grid-cols-5 gap-4"
+            className="grid grid-cols-1  md:grid-cols-5 gap-2"
           >
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Código
               </label>
@@ -291,13 +288,13 @@ export default function RegisterNewProducts() {
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value)}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Nombre del Producto
               </label>
@@ -305,6 +302,7 @@ export default function RegisterNewProducts() {
                 id="nombreProducto"
                 type="text"
                 value={nombreProducto}
+                ref={refInputPN}
                 onChange={(e) => {
                   setNombreProducto(e.target.value);
                   const valuer = e.target.value.toLowerCase();
@@ -318,43 +316,18 @@ export default function RegisterNewProducts() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
-
-              <div
-                className={`absolute overflow-y-scroll bg-blue-500 text-white h-36 w-64 my-2 rounded-md  ${
-                  productFilterByName.length == 0 ? "hidden" : "block"
-                }`}
-              >
-                {productFilterByName.length > 0
-                  ? productFilterByName.map((e, i) => {
-                      return (
-                        <div
-                          key={i}
-                          className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
-                        >
-                          <button
-                            className="w-full text-start"
-                            onClick={() => {
-                              setCodigo(e.code);
-                              setNombreProducto(e.name);
-                              setprecioCosto(e.priceCost);
-                              setprecioVenta(e.priceSell);
-                              setproductFilterByName([]);
-                            }}
-                          >
-                            {e.name}
-                          </button>
-                        </div>
-                      );
-                    })
-                  : null}
-              </div>
+              <FindProductByName
+                name={nombreProducto}
+                setters={{ setCodigo }}
+                refInput={refInputPN ? refInputPN : null}
+              />
             </div>
             <div>
               <label
                 htmlFor="costPrice"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Precio de costo
               </label>
@@ -364,13 +337,13 @@ export default function RegisterNewProducts() {
                 value={precioCosto}
                 onChange={(e) => setprecioCosto(e.target.value)}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="sellPrice"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Precio de venta
               </label>
@@ -379,13 +352,13 @@ export default function RegisterNewProducts() {
                 type="number"
                 value={precioVenta}
                 onChange={(e) => setprecioVenta(e.target.value)}
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Cantidad
               </label>
@@ -395,13 +368,13 @@ export default function RegisterNewProducts() {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
-                className="w-full px-3 py-1  border border-black rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
             <div className=" flex  ">
               <label
                 htmlFor="costPrice"
-                className="block mr-5 text-xs font-bold text-gray-700 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
               >
                 Generar Ticket
               </label>
@@ -410,101 +383,26 @@ export default function RegisterNewProducts() {
                 type="checkbox"
                 checked={GenerateTicked}
                 onChange={(e) => setGenerateTicked(e.target.checked)}
-                className="scale-150"
+                className="ml-5 scale-150"
               />
             </div>
-            <div className="md:col-span-5">
-              <button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground py-1  px-4 rounded-md hover:bg-primary-dark transition duration-300"
-              >
-                {editandoId !== null
-                  ? "Actualizar Producto"
-                  : "Agregar Producto Registrado"}
-              </button>
-            </div>
+            <AddToTabe editandoId={editandoId} label={"Agregar producto para ingresar"}/>
           </form>
         </div>
 
-        <div className="bg-white shadow-lg rounded-lg px-3 py-1">
-          <h2 className="text-xl font-semibold mb-2 text-primary">
-            Productos ingresados
-          </h2>
-          <div className="overflow-x-auto overflow-scroll h-52" ref={ref}>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Código
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Nombre
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Precio Costo
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Precio Venta
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Cantidad
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Ticket
-                  </th>
-                  <th className="px-6 py-1 text-left text-xs font-bold border border-black text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {productos.map((producto, i) => (
-                  <tr key={i}>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.codigo}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.nombre}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      ${producto.precioCosto.toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      ${producto.precioVenta.toLocaleString("es-co")}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.cantidad}
-                    </td>
-                    <td className="px-6 py-1 whitespace-nowrap text-xs font-bold border border-black">
-                      {producto.GenerateTicked ? "Si" : "No"}
-                    </td>
-                    <td className="px-6 py-1 border border-black text-xs whitespace-nowrap  font-bold">
-                      <button
-                        onClick={() => editarProducto(producto.id)}
-                        className="text-indigo-600 text-xs hover:text-indigo-900 mr-2"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => eliminarProducto(producto.id)}
-                        className="text-red-600 text-xs hover:text-red-900"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="mt-6 flex justify-between items-center">
-            <button
-              onClick={guardarRegistro}
-              className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
-            >
-              Guardar registro
-            </button>
-          </div>
+        <RegisterPTable
+          productos={productos}
+          refScroll={ref}
+          editarProducto={editarProducto}
+          eliminarProducto={eliminarProducto}
+        />
+        <div className="ml-5 mt-6 flex justify-between items-center">
+          <button
+            onClick={guardarRegistro}
+            className=" text-white py-1  px-4  bg-emerald-500 hover:bg-emerald-400 transition duration-300 border border-emerald-900"
+          >
+            Guardar registro
+          </button>
         </div>
       </div>
     </div>

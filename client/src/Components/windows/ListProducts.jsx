@@ -13,7 +13,8 @@ export default function ListProduct() {
   const [productspaginate, setproductspaginate] = useState([]);
   const [pageNum, setpageNum] = useState(1);
   const [pageSize, setpageSize] = useState(10);
-const [errorPagination, seterrorPagination] = useState(false)
+  const [totalPages, settotalPages] = useState(0);
+  const [errorPagination, seterrorPagination] = useState(false);
   const handleDelete = useCallback(async (id) => {
     DeleteProductAPI({ id });
     setProducts((products) => products.filter((product) => product._id !== id));
@@ -48,23 +49,31 @@ const [errorPagination, seterrorPagination] = useState(false)
     }
 
     if (nameFilter.length === 0 && codeFilter.length === 0) {
-      GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>
-        setproductspaginate(res.data.products)
-      );
+      GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) => {
+        const totalPagesRounded = res.data.info.productsSize / pageSize;
+        setproductspaginate(res.data.products);
+        settotalPages(Math.ceil(totalPagesRounded));
+      });
     }
   }, [codeFilter, nameFilter]);
 
   //paginacion
   useEffect(() => {
-    GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) =>{
-      seterrorPagination(false)
-      setproductspaginate(res.data.products)
-    }
-    ).catch(err => {
-      setpageNum(pageNum - 1)
-      seterrorPagination(true)
-    })
+    GETPRODUCTBYSECTION({ pageNum, pageSize }).then((res) => {
+      seterrorPagination(false);
+      setproductspaginate(res.data.products);
+    });
   }, [pageNum, pageSize]);
+
+  const handleUpPagination = () => {
+    if (totalPages > pageNum) {
+      setpageNum(pageNum + 1);
+      setcodeFilter("");
+      setnameFilter("");
+    }
+  };
+
+  useEffect(() => {}, [pageNum]);
 
   return (
     <div className=" p-4 bg-gray-900 h-full min-h-screen">
@@ -148,7 +157,10 @@ const [errorPagination, seterrorPagination] = useState(false)
         </div>
       </div>
       <div className="overflow-x-auto">
-        <TableProducts productspaginate={productspaginate} handleDelete={handleDelete} />
+        <TableProducts
+          productspaginate={productspaginate}
+          handleDelete={handleDelete}
+        />
       </div>
       <div className="flex justify-center items-center my-5 ">
         <button
@@ -172,13 +184,7 @@ const [errorPagination, seterrorPagination] = useState(false)
               ? "bg-gray-800 "
               : "bg-gray-500 opacity-50"
           } p-2 text-white rounded-md `}
-          onClick={() => {
-            if (productspaginate.length > pageSize - 1) {
-              setpageNum(pageNum + 1);
-              setcodeFilter("");
-              setnameFilter("");
-            }
-          }}
+          onClick={handleUpPagination}
         >
           <FaChevronRight />
         </button>

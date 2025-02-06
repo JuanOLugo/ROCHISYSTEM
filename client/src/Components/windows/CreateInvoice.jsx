@@ -11,6 +11,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FindProductByName from "../Insertions/FindProductByName";
 import InvoiceTable from "../Insertions/invoiceTable";
+import AddToTabe from "../Insertions/AddToTabe";
+import TitleForTables from "../Insertions/TitleForTables";
 export default function CreateInvoice() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const date = new Date();
@@ -308,7 +310,9 @@ export default function CreateInvoice() {
     <div className=" bg-gray-900 h-screen grid ">
       <ToastContainer containerId={2} />
       <div className="space-y-2  ">
+        
         <div className="px-5">
+        <TitleForTables Label={"Facturero"} />
           <form
             autoComplete="off"
             onSubmit={(e) => globalError ? e.preventDefault() : AddAndEditProducts(e) }
@@ -441,16 +445,7 @@ export default function CreateInvoice() {
                 className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
               />
             </div>
-            <div className="md:col-span-5">
-              <button
-                type="submit"
-                className="w-full  bg-gray-700 text-primary-foreground py-1  px-4  hover:bg-primary-dark transition duration-300"
-              >
-                {editandoId !== null
-                  ? "Actualizar Producto"
-                  : "Agregar Producto"}
-              </button>
-            </div>
+            <AddToTabe editandoId={editandoId} label={"Agregar producto a factura"} />
           </form>
         </div>
 

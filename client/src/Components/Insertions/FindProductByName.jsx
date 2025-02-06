@@ -7,10 +7,10 @@ function FindProductByName({ name, setters, refInput }) {
   const [handleBlur, sethandleBlur] = useState(true);
   const refContainer = useRef(null);
   useEffect(() => {
-    if (handleFocus) {
+    if (handleFocus && name.length > 0) {
       GETPRODUCTBYNAME({ name }).then((data) => setproducts(data.data.product));
     }
-  }, [name]);
+  }, [name, handleFocus]);
 
 
   useEffect(() => {

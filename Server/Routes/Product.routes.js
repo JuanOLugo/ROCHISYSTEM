@@ -88,15 +88,19 @@ pRouter.post("/update", async (req, res) => {
       })
     );
 
-    try {
+    const executeCommand = new Promise((resolve, reject) => {
       exec("bartend", (err, data) => {
-        console.log(err);
-        console.log(data.toString());
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
       });
-      console.log("ejecutado");
-    } catch (error) {
-      console.log("no ejecutado");
-    }
+    });
+    const response = await executeCommand.catch((error) => {
+      return error;
+    });
+    if (response) return res.status(400).send("Error al ejecutar el comando desde el servidor | Contactar al desarrollador");
   }
 
   //Find by code if product exist
@@ -196,7 +200,9 @@ pRouter.post("/getproductbysection", async (req, res) => {
       pageNum * pageSize
     );
   } else if (nameFilter) {
-    arrayProducts = products.filter((p) => p.name.toLowerCase().includes(nameFilter.toLowerCase()));
+    arrayProducts = products.filter((p) =>
+      p.name.toLowerCase().includes(nameFilter.toLowerCase())
+    );
     arrayProducts = arrayProducts.slice(
       (pageNum - 1) * pageSize,
       pageNum * pageSize
@@ -206,19 +212,20 @@ pRouter.post("/getproductbysection", async (req, res) => {
       (pageNum - 1) * pageSize,
       pageNum * pageSize
     );
-
-    
   }
 
   let final;
 
-  if(arrayProducts.length > pageSize - 1){
-    final = false
-  }else final = true
+  if (arrayProducts.length > pageSize - 1) {
+    final = false;
+  } else final = true;
 
   if (arrayProducts.length > 0) {
-    res.status(200).send({ products: arrayProducts, info: {...info, final}  });
-  } else res.status(400).send({ message: "No hay productos", info: {...info, final} });
+    res.status(200).send({ products: arrayProducts, info: { ...info, final } });
+  } else
+    res
+      .status(400)
+      .send({ message: "No hay productos", info: { ...info, final } });
 });
 
 module.exports = pRouter;
