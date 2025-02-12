@@ -38,7 +38,10 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDi
       data.totalMoney = parseInt(ClientMoney);
       data.paymentMethod = PayMethod;
       data = { ...data, nequiTotal: NequiValue }
-
+      setTimeout(() => {
+        setonButtonHandler(true)
+        onclose();
+      }, 100)
       try {
         await CreateInvoiceAPI({ invoice: data })
         toast.success('Factura Creada ✅', {
@@ -65,10 +68,7 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDi
       }
       setPayMethod("Efectivo");
 
-      setTimeout(() => {
-        setonButtonHandler(true)
-        onclose();
-      }, 100)
+      
       setClientMoney(0);
       setProductos([]);
       setDiscount("")
