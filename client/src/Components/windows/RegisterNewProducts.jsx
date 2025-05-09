@@ -317,6 +317,7 @@ export default function RegisterNewProducts() {
                 name={nombreProducto}
                 setters={{ setCodigo }}
                 refInput={refInputPN ? refInputPN : null}
+                isFilterByCode={isFilterBycode}
               />
             </div>
             <div>
