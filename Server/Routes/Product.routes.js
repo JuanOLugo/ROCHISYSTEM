@@ -69,7 +69,7 @@ pRouter.post("/delete", async (req, res) => {
 
 pRouter.post("/update", async (req, res) => {
   const { productos } = req.body;
-
+  console.log(productos)
   const productAddForTicket = productos.filter(
     (e) => e.GenerateTicked === true
   );
@@ -84,6 +84,7 @@ pRouter.post("/update", async (req, res) => {
       rutaDirectorio,
       converter.json2csv(productAddForTicket, (err, csv) => {
         if (err) console.log(err);
+        console.log(csv, productAddForTicket)
         return csv;
       })
     );
