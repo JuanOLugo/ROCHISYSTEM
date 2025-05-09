@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { GETPRODUCTBYNAME } from "../../Controllers/Product.controller";
 
-function FindProductByName({ name, setters, refInput }) {
+function FindProductByName({ name, setters, refInput, isFilterByCode }) {
   const [products, setproducts] = useState([]);
   const [handleFocus, sethandleFocus] = useState(false);
   const [handleBlur, sethandleBlur] = useState(true);
@@ -10,16 +10,19 @@ function FindProductByName({ name, setters, refInput }) {
     if (handleFocus && name.length > 0) {
       GETPRODUCTBYNAME({ name }).then((data) => setproducts(data.data.product));
     }
+    console.log(handleFocus, name, isFilterByCode)
+    
   }, [name, handleFocus]);
 
 
   useEffect(() => {
 
       const InputRef = refInput.current;
-      InputRef.addEventListener("focus", () => {
-        sethandleFocus(true);
-
-      });
+      if(InputRef.value.length > 0 ){
+        if(!isFilterByCode){
+          sethandleFocus(true)
+        }else sethandleFocus(false)
+      }else sethandleFocus(false)
 
       window.addEventListener("click", (e) => {
         if(e.target === refContainer.current === false && e.target === refInput.current === false ){
@@ -27,7 +30,7 @@ function FindProductByName({ name, setters, refInput }) {
             sethandleFocus(false)
         }
       });
-  }, [refInput]);
+  }, [refInput, name]);
 
 
     return (

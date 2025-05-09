@@ -34,9 +34,10 @@ export default function CreateInvoice() {
   const [DiscontSection, setDiscontSection] = useState(false);
   const [VerifyProductIn, setVerifyProductIn] = useState(0);
   const [globalError, setglobalError] = useState(false)
- 
+ const [Key, setKey] = useState("")
   const refInputPN = useRef(null);
-
+  const refSave = useRef(null)
+  const refCode = useRef(null)
   //Reset Input Functions
    const resetInputsF = () => {
     setCodigo("");
@@ -52,6 +53,12 @@ export default function CreateInvoice() {
 
   
 
+  useEffect(() => {
+    document.addEventListener("keydown", (e) => setKey(e.key))
+    refCode.current.focus()
+  }, [])
+  
+
   //error management
 
   const [codeFully, setCodeFully] = useState(false);
@@ -62,8 +69,24 @@ export default function CreateInvoice() {
       setisFilterBycode(false)
       
     }else filterProductByCode(codigo)
+
+    
   }, [codigo]);
 
+  useEffect(() => {
+    console.log(Key)
+  }, [Key])
+  
+  useEffect(() => {
+    if(isFilterBycode){
+      setTimeout(() => {
+        if(Key === "Enter"){
+          refSave.current.requestSubmit()
+        }
+      }, 50)
+    }
+  }, [isFilterBycode])
+  
   
   useEffect(() => {
       if(codeFully ){
@@ -80,6 +103,7 @@ export default function CreateInvoice() {
 
   const filterProductByCode = async (codigo) => {
     if (codigo.length === 4) {
+      
       const verify = DBProducts.some((p) => p.code === codigo);
       if (!verify) {
         try {
@@ -91,12 +115,14 @@ export default function CreateInvoice() {
             );
             if (!validation) setDBProducts([...DBProducts, individualProduct]);
             if (individualProduct) {
-              setisFilterBycode(true);
+              setCodeFully(false);
               setNombreProducto(individualProduct.name);
               setPrecio(individualProduct.priceSell);
               setidIndividualProduct(individualProduct._id);
               setindividualMaxProduct(individualProduct.stock);
-              setCodeFully(false);
+              setisFilterBycode(true);
+              
+              
             } else {
               setisFilterBycode(false);
             }
@@ -199,9 +225,11 @@ export default function CreateInvoice() {
 
           return p;
         });
+
         setProductos(AddnewAmount);
         resetInputsF();
       }
+      refCode.current.focus()
     }
 
     if (editandoId) {
@@ -223,6 +251,7 @@ export default function CreateInvoice() {
       setEditandoId(null);
       setindividualMaxProduct(0);
       resetInputsF();
+      refCode.current.focus()
     }
   };
 
@@ -314,6 +343,7 @@ export default function CreateInvoice() {
         <div className="px-5">
         <TitleForTables Label={"Facturero"} />
           <form
+          ref={refSave}
             autoComplete="off"
             onSubmit={(e) => globalError ? e.preventDefault() : AddAndEditProducts(e) }
             className="grid grid-cols-1  md:grid-cols-5 gap-2"
@@ -327,6 +357,7 @@ export default function CreateInvoice() {
               </label>
 
               <input
+              ref={refCode}
                 id="codigo"
                 type="text"
                 minLength={4}
@@ -387,6 +418,7 @@ export default function CreateInvoice() {
                   setindividualMaxProduct,
                   setproductFilterByName,
                 }}
+                isFilterByCode={isFilterBycode}
               />
             </div>
             <div>
