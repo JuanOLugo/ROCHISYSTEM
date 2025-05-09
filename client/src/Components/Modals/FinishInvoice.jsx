@@ -38,10 +38,10 @@ function FinishInvoice({ isOpen, onOpen, onOpenChange, data, setProductos, setDi
       data.totalMoney = parseInt(ClientMoney);
       data.paymentMethod = PayMethod;
       data = { ...data, nequiTotal: NequiValue }
-      setTimeout(() => {
+      Promise.all(setTimeout(() => {
         setonButtonHandler(true)
         onclose();
-      }, 100)
+      }, 500))
       try {
         await CreateInvoiceAPI({ invoice: data })
         toast.success('Factura Creada ✅', {
