@@ -189,7 +189,7 @@ export default function CreateProduct() {
   };
 
   return (
-    <div className="  px-3 w-full  bg-gray-900 pt-5 h-screen">
+    <div className="  px-3 w-full  bg-white pt-5 h-screen">
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -204,7 +204,7 @@ export default function CreateProduct() {
       />
       <div className="w-full grid justify-end ">
         <h1
-          className=" text-gray-200 text-xl cursor-pointer w-8 p-3"
+          className=" text-gray-900  text-xl cursor-pointer w-8 p-3"
           onClick={() => {
             setOpenConfig(!OpenConfig);
           }}
@@ -212,9 +212,9 @@ export default function CreateProduct() {
           <FaLinesLeaning />
         </h1>
         {!OpenConfig ? null : (
-          <div className="right-9  p-3 bg-gray-800 border border-gray-700  text-gray-200 mt-8 absolute">
+          <div className="right-9  p-3 bg-white border border-gray-900 rounded-md  text-gray-900  mt-8 absolute">
             <div className="w-80">
-              <div className="flex text-gray-200 justify-between ml-2 ">
+              <div className="flex text-gray-900  justify-between ml-2 ">
                 <h1 className="font-bold "> Calcular porcentaje </h1>
                 <input
                   type="checkbox"
@@ -243,15 +243,15 @@ export default function CreateProduct() {
                 />
               </div>
               {!isChecked ? null : (
-                <div className=" grid  bg-gray-800 border border-gray-700  text-gray-200 mt-2 ">
-                  <div className="text-gray-200 m-2 ">
+                <div className=" grid  bg-white border border-gray-900 rounded-md  text-gray-900  mt-2 ">
+                  <div className="text-gray-900  m-2 ">
                     <h1 className="font-bold">Porcentaje %</h1>
                     <input
                       type="number"
                       name=""
                       id=""
                       value={Percent}
-                      className=" px-1 py-1   bg-gray-800 border border-gray-700  text-gray-200  shadow-sm focus:outline-none focus:ring-primary mt-1 focus:border-primary"
+                      className=" px-1 py-1   bg-white border border-gray-900 rounded-md  text-gray-900   shadow-sm focus:outline-none focus:ring-primary mt-1 focus:border-primary"
                       placeholder="Cantidad porcentaje"
                       onChange={(e) => {
                         setPercent(e.target.value);
@@ -272,7 +272,7 @@ export default function CreateProduct() {
                             setMinorTo(false);
                           }}
                         />
-                        <h1 className="text-gray-200 ">
+                        <h1 className="text-gray-900  ">
                           <FaArrowUp />
                         </h1>
                       </div>
@@ -287,7 +287,7 @@ export default function CreateProduct() {
                             setMayorTo(false);
                           }}
                         />
-                        <h1 className="text-gray-200 ">
+                        <h1 className="text-gray-900  ">
                           <FaArrowDown />
                         </h1>
                       </div>
@@ -301,7 +301,7 @@ export default function CreateProduct() {
       </div>
       <div className=" flex flex-col md:flex-row w-full  ">
         <div className="flex-1  shadow-lg rounded-lg  w-full ">
-          <h2 className="text-2xl font-bold mb-4  text-gray-200">
+          <h2 className="text-2xl font-bold mb-4  text-blue-500">
             Crear Producto
           </h2>
           <form
@@ -314,7 +314,7 @@ export default function CreateProduct() {
                 <label
                   htmlFor="codigo"
                   className={`block text-sm font-medium ${
-                    !codeLenght ? "text-gray-400 " : "text-red-700 opacity-50"
+                    !codeLenght ? "text-gray-900 " : "text-red-700 opacity-50"
                   }  mb-1`}
                 >
                   Código de Producto
@@ -328,9 +328,9 @@ export default function CreateProduct() {
                   onChange={(e) => setCodigo(e.target.value)}
                   placeholder="Ingrese el código del producto"
                   required
-                  className={`w-full px-3 py-2 text-primary-foreground ${
+                  className={`w-full px-3 py-2  ${
                     !codeLenght
-                      ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                      ? "bg-white border border-gray-700 rounded-md focus:border-primary "
                       : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
                   }    shadow-sm focus:outline-none focus:ring-primary `}
                 />
@@ -342,7 +342,7 @@ export default function CreateProduct() {
               <div className=" w-full">
                 <label
                   htmlFor="nombre"
-                  className="block text-sm font-medium text-gray-400 mb-1"
+                  className="block text-sm font-medium text-gray-900 mb-1"
                 >
                   Nombre del Producto
                 </label>
@@ -353,7 +353,7 @@ export default function CreateProduct() {
                   onChange={(e) => setNombre(e.target.value)}
                   placeholder="Ingrese el nombre del producto"
                   required
-                  className="w-full px-3 py-2  bg-gray-800 border border-gray-700  text-gray-200  shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full px-3 py-2  bg-white border border-gray-900 rounded-md  text-gray-900   shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 />
               </div>
             </div>
@@ -361,7 +361,7 @@ export default function CreateProduct() {
               <div className="mr-2 w-1/2 ">
                 <label
                   htmlFor="precio"
-                  className="block text-sm font-medium text-gray-400 mb-1"
+                  className="block text-sm font-medium text-gray-900 mb-1"
                 >
                   Precio de costo
                 </label>
@@ -372,7 +372,7 @@ export default function CreateProduct() {
                   onChange={(e) => setPrecioCosto(e.target.value)}
                   placeholder="Ingrese el precio del producto"
                   required
-                  className="w-full px-3 py-2  bg-gray-800 border border-gray-700  text-gray-200  shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                  className="w-full px-3 py-2  bg-white border border-gray-900 rounded-md  text-gray-900   shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                 />
               </div>
 
@@ -380,7 +380,7 @@ export default function CreateProduct() {
                 <label
                   htmlFor="precio"
                   className={`block text-sm font-medium ${
-                    !Lose ? "text-gray-400 " : "text-red-700 opacity-50"
+                    !Lose ? "text-gray-900 " : "text-red-700 opacity-50"
                   }  mb-1`}
                 >
                   Precio de venta
@@ -394,9 +394,9 @@ export default function CreateProduct() {
                   required
                   className={`w-full px-3 py-2  ${
                     !Lose
-                      ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                      ? "bg-white border border-gray-900 rounded-md focus:border-primary "
                       : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
-                  } text-gray-200  shadow-sm focus:outline-none focus:ring-primary `}
+                  } text-gray-900   shadow-sm focus:outline-none focus:ring-primary `}
                 />
                 <label className="text-red-700 font-light text-sm ">
                   {!Lose ? null : "No puede ser menor que el precio de costo"}
@@ -407,7 +407,7 @@ export default function CreateProduct() {
             <div className="">
               <label
                 htmlFor="proveedor"
-                className="block text-sm font-medium text-gray-400 mb-1"
+                className="block text-sm font-medium text-gray-900 mb-1"
               >
                 Proveedor (Opcional)
               </label>
@@ -417,7 +417,7 @@ export default function CreateProduct() {
                 value={proveedor}
                 onChange={(e) => setProveedor(e.target.value)}
                 placeholder="Ingrese el proveedor del producto"
-                className="w-full px-3 py-2  bg-gray-800 border border-gray-700  text-gray-200  shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                className="w-full px-3 py-2  bg-white border border-gray-900 rounded-md  text-gray-900   shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -425,14 +425,14 @@ export default function CreateProduct() {
               <div className="mr-2 w-1/2">
                 <label
                   htmlFor="stock"
-                  className="block text-sm font-medium text-gray-400 mb-1"
+                  className="block text-sm font-medium text-gray-900 mb-1"
                 >
                   Antiguedad Del producto
                 </label>
                 <select
                   name=""
                   id=""
-                  className=" bg-gray-800 border border-gray-700  text-gray-200 w-full  py-2"
+                  className=" bg-white border border-gray-900 rounded-md  text-gray-900  w-full  py-2"
                   onChange={(e) => setProductIs(e.target.value)}
                 >
                   <option value="old">Antiguo</option>
@@ -444,7 +444,7 @@ export default function CreateProduct() {
                 <div className="w-1/2">
                   <label
                     htmlFor="stock"
-                    className="block text-sm font-medium text-gray-400 mb-1"
+                    className="block text-sm font-medium text-gray-900 mb-1"
                   >
                     Stock
                   </label>
@@ -455,14 +455,14 @@ export default function CreateProduct() {
                     onChange={(e) => setStock(parseInt(e.target.value))}
                     placeholder="Ingrese el stock del producto"
                     required={ProductIs == "old"}
-                    className="w-full px-3 py-2  bg-gray-800 border border-gray-700  text-gray-200  shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                    className="w-full px-3 py-2  bg-white border border-gray-900 rounded-md  text-gray-900  shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
                   />
                 </div>
               ) : null}
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-500 text-primary-foreground py-2 px-4  hover:bg-primary-dark transition duration-300"
+              className="w-full bg-blue-600 rounded-md  hover:bg-blue-500 text-primary-foreground py-2 px-4  hover:bg-primary-dark transition duration-300"
             >
               Guardar Producto
             </button>

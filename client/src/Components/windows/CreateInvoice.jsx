@@ -307,7 +307,7 @@ export default function CreateInvoice() {
   };
 
   return (
-    <div className=" bg-gray-900 h-screen grid ">
+    <div className=" bg-white h-screen grid ">
       <ToastContainer containerId={2} />
       <div className="space-y-2  ">
         
@@ -321,7 +321,7 @@ export default function CreateInvoice() {
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Código
               </label>
@@ -337,9 +337,9 @@ export default function CreateInvoice() {
                 required
                 className={`w-full px-3  py-1 ${
                   !codeFully
-                    ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                    ? "bg-white border border-blue-500  rounded focus:border-primary "
                     : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
-                } text-gray-200`}
+                } text-gray-900`}
               />
               <h1 className="  text-sm text-red-700 opacity-50 ">
                 {codeFully ? "No existe este codigo" : null}
@@ -349,7 +349,7 @@ export default function CreateInvoice() {
 
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm  lg:text-base font-normal text-gray-200  mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-900  mb-1"
               >
                 Nombre del Producto
               </label>
@@ -374,7 +374,7 @@ export default function CreateInvoice() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-blue-500  rounded focus:border-primary text-gray-900"
               />
               <FindProductByName
                 name={nombreProducto}
@@ -392,7 +392,7 @@ export default function CreateInvoice() {
             <div>
               <label
                 htmlFor="precio"
-                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-900 mb-1"
               >
                 Precio
               </label>
@@ -405,13 +405,13 @@ export default function CreateInvoice() {
                 placeholder="Precio"
                 step="0.01"
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-blue-500 rounded focus:border-primary text-gray-900"
               />
             </div>
             <div>
               <label
                 htmlFor="descuento"
-                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-900 mb-1"
               >
                 Descuento (%)
               </label>
@@ -423,13 +423,13 @@ export default function CreateInvoice() {
                 onChange={(e) => setDescuento(e.target.value)}
                 min="0"
                 max="100"
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-blue-500  rounded focus:border-primary text-gray-900"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm  lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm  lg:text-base font-normal text-gray-900 mb-1"
               >
                 Cantidad
               </label>
@@ -442,7 +442,7 @@ export default function CreateInvoice() {
                 placeholder="Cantidad a llevar"
                 max={individualMaxProduct}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-blue-500  rounded focus:border-primary text-gray-900"
               />
             </div>
             <AddToTabe editandoId={editandoId} label={"Agregar producto a factura"} />
@@ -451,14 +451,14 @@ export default function CreateInvoice() {
 
        <div className="px-5">
        <InvoiceTable productos={productos} eliminarProducto={eliminarProducto} editarProducto={editarProducto} />
-          <div className="mt-3 flex justify-between items-center">
-            <span className="text-xl font-normal text-gray-200">
-              Total: ${calcularTotal().toLocaleString("es-co")}
+          <div className="mt-3 flex justify-between  items-center">
+            <span className="text-xl font-semibold text-white  cursor-pointer bg-blue-500 shadow-md hover:bg-blue-600 transition-all p-2 rounded-md ">
+              Total: <label className="hover:text-2xl transition-all" htmlFor="">${calcularTotal().toLocaleString("es-co")}</label>
             </span>
 
             {DiscontSection ? (
-              <div className="  bg-gray-700 w-72  p-2 rounded-sm">
-                <label htmlFor="" className="text-gray-200 font-light ">
+              <div className="  bg-blue-500 w-72 shadow-md border border-blue-400 rounded-md p-2 ">
+                <label htmlFor="" className="text-white font-light ">
                   Porcentaje de descuento a la factura
                 </label>
                 <input
@@ -468,9 +468,9 @@ export default function CreateInvoice() {
                   onChange={(e) => setInvoiceDiscont(parseInt(e.target.value))}
                   className={`w-full px-3  py-1 ${
                     !inputDiscount
-                      ? "bg-gray-800 border border-gray-700 focus:border-primary "
+                      ? "bg-white-800 border border-gray-700 rounded-md focus:border-primary "
                       : "bg-red-800 opacity-50 border focus:border-red-700 border-red-700 "
-                  } text-gray-200`}
+                  } text-gray-900`}
                 />
                 <h1 className="  text-sm text-red-700 opacity-50 ">
                   {inputDiscount
@@ -483,14 +483,14 @@ export default function CreateInvoice() {
             <div>
               <button
                 onClick={() => setDiscontSection(!DiscontSection)}
-                className=" text-white py-1  px-4 mr-3  bg-blue-600 hover:bg-blue-500 transition duration-300 border border-blue-900"
+                className=" text-white py-1  px-4 mr-3  bg-blue-500 hover:bg-blue-600 transition duration-300 border border-blue-400 shadow-md rounded-md"
               >
                 Agregar descuento a la factura
               </button>
 
               <button
                 onClick={finishFactura}
-                className=" text-white py-1  px-4  bg-emerald-500 hover:bg-emerald-400 transition duration-300 border border-emerald-900"
+                className=" text-white py-1  px-4 shadow-md rounded-md bg-emerald-500 hover:bg-emerald-600 transition duration-300 border border-emerald-400"
               >
                 Guardar Factura
               </button>

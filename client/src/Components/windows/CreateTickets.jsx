@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import FinishInvoice from "../Modals/FinishInvoice";
 import {
   GetProductAPI,
+  GETPRODUCTBYCODE,
   UpdateProductsAPI,
 } from "../../Controllers/Product.controller";
 import { ToastContainer, toast } from "react-toastify";
@@ -12,6 +13,8 @@ import { GenerateTicketsAPI } from "../../Controllers/Tickets.controller";
 import TicketsTable from "../Insertions/TicketsTable";
 import AddToTabe from "../Insertions/AddToTabe";
 import TitleForTables from "../Insertions/TitleForTables";
+import FindProductByName from "../Insertions/FindProductByName";
+import { set } from "date-fns";
 
 export default function CreateTickets() {
   const [productFilterByName, setproductFilterByName] = useState([]);
@@ -22,21 +25,11 @@ export default function CreateTickets() {
   const [isFilterBycode, setisFilterBycode] = useState(false);
   const [productos, setProductos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
-  const [DBProducts, setDBProducts] = useState(null);
+  const [DBProducts, setDBProducts] = useState([]);
   const [GenerateTicked, setGenerateTicked] = useState(true);
   const [productExist, setproductExist] = useState(false);
-
-  useEffect(() => {
-    const data = new Promise((res, rej) => {
-      const data = GetProductAPI();
-      data ? res(data) : rej({ message: "Error" });
-    });
-    data
-      .then((data) => setDBProducts(data.data))
-      .catch((err) => {
-        throw new Error(err.response.data.message);
-      });
-  }, []);
+  const [IdIndividualProduct, setIdIndividualProduct] = useState(null);
+  const refInputPN = useRef();
 
   const ref = useRef();
   const refFocus = useRef();
@@ -47,79 +40,144 @@ export default function CreateTickets() {
     }
   }, [productos]);
 
-  useEffect(() => {
-    if (codigo) {
-      const verify = DBProducts.filter((p) => p.code === codigo);
-      if (verify.length > 0) {
-        setproductExist(true);
-      } else setproductExist(false);
-    }
-  }, [codigo]);
+  const filterProductByCode = async (codigo) => {
+    if (codigo.length === 4) {
+      const verify = DBProducts.some((p) => p.code === codigo);
+      console.log(!verify);
+      if (!verify) {
+        try {
+          const data = await GETPRODUCTBYCODE({ code: codigo });
+          console.log(data);
+          const individualProduct = data.data.product;
 
-  const agregarProducto = (e) => {
-    e.preventDefault();
-    if (productExist) {
-      if (editandoId !== null) {
-        setProductos(
-          productos.map((p) =>
-            p.id === editandoId
-              ? {
-                  ...p,
-                  codigo,
-                  nombre: nombreProducto,
-                  precioVenta,
-                  cantidad,
-                }
-              : p
-          )
-        );
-        setEditandoId(null);
-        setisFilterBycode(false);
+          if (data) {
+            const validation = DBProducts.some(
+              (p) => p.code === individualProduct.code
+            );
+            if (!validation) setDBProducts([...DBProducts, individualProduct]);
+            if (individualProduct) {
+              setisFilterBycode(true);
+              setNombreProducto(individualProduct.name);
+              setCodigo(individualProduct.code);
+              setprecioVenta(individualProduct.priceSell);
+              setIdIndividualProduct(individualProduct._id);
+              return true;
+            } else {
+              setisFilterBycode(false);
+              return false;
+            }
+          }
+        } catch (error) {
+          console.log(error);
+          return false;
+        }
       } else {
-        setProductos([
-          ...productos,
-          {
-            id: Date.now(),
-            codigo,
-            nombre: nombreProducto,
-            precioVenta,
-            cantidad,
-          },
-        ]);
+        const individualProduct = DBProducts.filter(
+          (p) => p.code === codigo
+        )[0];
+        console.log(individualProduct);
+        if (individualProduct) {
+          setisFilterBycode(true);
+          setNombreProducto(individualProduct.name);
+          setprecioVenta(individualProduct.priceSell);
+          setIdIndividualProduct(individualProduct._id);
+          setCodigo(individualProduct.code);
+          return true;
+        } else {
+          setisFilterBycode(false);
+          return false;
+        }
       }
+    }
+  };
+
+  const AddAndEditProducts = (e) => {
+    e.preventDefault();
+    if (IdIndividualProduct) {
+      if (!productos.some((p) => p.codigo === codigo)) {
+        const productToAdd = {
+          _id: IdIndividualProduct,
+          id: +new Date(),
+          codigo,
+          precioVenta,
+          cantidad,
+          nombre: nombreProducto,
+        };
+
+        setProductos([...productos, productToAdd]);
+        setCodigo("");
+        setNombreProducto("");
+        setprecioVenta("");
+        setCantidad("");
+        setisFilterBycode(false);
+        setIdIndividualProduct(null);
+      } else {
+        const AddnewAmount = productos.filter((p) => {
+          if (p.codigo === codigo) {
+            p.cantidad = cantidad;
+            p.precioVenta = precioVenta;
+            p.nombre = nombreProducto;
+          }
+          return p;
+        });
+        setProductos(AddnewAmount);
+        setCodigo("");
+        setNombreProducto("");
+        setprecioVenta("");
+        setCantidad("");
+        setisFilterBycode(false);
+        setIdIndividualProduct(null);
+      }
+    }
+
+    if (editandoId) {
+      const editingProducts = productos.filter((p) => {
+        if (p.id === editandoId) {
+          p.nombre = nombreProducto;
+          p.cantidad = cantidad;
+          p.precioVenta = parseInt(precioVenta);
+        }
+        return p;
+      });
+
+      setProductos(editingProducts);
+      setEditandoId(null);
       setCodigo("");
       setNombreProducto("");
       setprecioVenta("");
       setCantidad("");
       setisFilterBycode(false);
-      refFocus.current.focus();
-    } else
-      toast.error(`El producto que intenta agregar no existe`, {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-  };
-
-  const editarProducto = (id) => {
-    const producto = productos.find((p) => p.id === id);
-    setisFilterBycode(true);
-    if (producto) {
-      setCodigo(producto.codigo);
-      setNombreProducto(producto.nombre);
-      setprecioVenta(producto.precioVenta);
-      setCantidad(producto.cantidad);
-      setEditandoId(id);
+      setIdIndividualProduct(null);
     }
   };
 
-  const eliminarProducto = (id) => {
-    setProductos(productos.filter((p) => p.id !== id));
+  const editarProducto = (id) => {
+    const productFilter = productos.filter((p) => {
+      if (p.id === id) {
+        return p;
+      }
+    })[0];
+
+    const { cantidad, codigo, nombre, precioVenta } = productFilter;
+
+    console.log(productFilter);
+    setCodigo(codigo);
+    setCantidad(cantidad);
+    setNombreProducto(nombre);
+    setprecioVenta(precioVenta);
+    setEditandoId(id);
+  };
+
+  const eliminarProducto = (id, stock) => {
+    const renewStock = DBProducts.filter((p) => {
+      if (p._id === id) {
+        p.stock = p.stock + stock;
+      }
+
+      return p;
+    });
+    setDBProducts(renewStock);
+    setProductos(productos.filter((p) => p._id !== id));
   };
 
   const guardarRegistro = async () => {
@@ -142,11 +200,11 @@ export default function CreateTickets() {
             }
           );
         } else {
-          toast.success("Registrados correctamente", {
+          toast.success("Productos registrados correctamente", {
             position: "bottom-right",
             autoClose: 5000,
             hideProgressBar: false,
-            closeOnClick: true,
+            closeOnClick: false,
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
@@ -155,11 +213,11 @@ export default function CreateTickets() {
           setProductos([]);
         }
       } catch (error) {
-        toast.error(error, {
+        toast.error(error.response.data, {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
-          closeOnClick: true,
+          closeOnClick: false,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
@@ -167,11 +225,11 @@ export default function CreateTickets() {
         });
       }
     } else
-      toast.warning("No hay productos que registrar", {
+      toast.warning("No hay productos que facturar", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
-        closeOnClick: true,
+        closeOnClick: false,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
@@ -179,21 +237,27 @@ export default function CreateTickets() {
       });
   };
 
+  useEffect(() => {
+    if (codigo.length === 4) {
+      filterProductByCode(codigo);
+    }
+  }, [codigo]);
+
   return (
-    <div className="bg-gray-900 h-screen grid">
-      <ToastContainer containerId={10} />
+    <div className="bg-white h-screen grid">
+      <ToastContainer containerId={102} />
       <div>
         <div className="px-5">
-        <TitleForTables Label={"Generador"} />
+          <TitleForTables Label={"Generador"} />
           <form
             autoComplete="off"
-            onSubmit={agregarProducto}
+            onSubmit={AddAndEditProducts}
             className="grid grid-cols-1  md:grid-cols-5 gap-2"
           >
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Código
               </label>
@@ -202,6 +266,7 @@ export default function CreateTickets() {
                 type="text"
                 value={codigo}
                 ref={refFocus}
+                placeholder="Código del producto"
                 onChange={(e) => {
                   setCodigo(e.target.value);
                   const filterProduct = DBProducts.filter(
@@ -217,69 +282,40 @@ export default function CreateTickets() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Nombre del Producto
               </label>
               <input
                 id="nombreProducto"
                 type="text"
+                ref={refInputPN}
                 value={nombreProducto}
+                placeholder="Nombre del producto"
                 onChange={(e) => {
                   const valuer = e.target.value.toLocaleLowerCase();
                   setNombreProducto(valuer);
-                  const productFilter = DBProducts.filter((p) =>
-                    p.name.toLowerCase().includes(valuer)
-                  );
-                  if (valuer.length > 0) {
-                    setproductFilterByName(productFilter);
-                  } else {
-                    setproductFilterByName([]);
-                  }
                 }}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
 
-              <div
-                className={`absolute overflow-y-scroll bg-blue-500 text-white h-36 w-64 my-2 rounded-md  ${
-                  productFilterByName.length == 0 ? "hidden" : "block"
-                }`}
-              >
-                {productFilterByName.length > 0
-                  ? productFilterByName.map((e, i) => {
-                      return (
-                        <div
-                          key={i}
-                          className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-blue-500 transition-all"
-                        >
-                          <button
-                            className="w-full text-start"
-                            onClick={() => {
-                              setCodigo(e.code);
-                              setNombreProducto(e.name);
-                              setprecioVenta(e.priceSell);
-                              setproductFilterByName([]);
-                            }}
-                          >
-                            {e.name}
-                          </button>
-                        </div>
-                      );
-                    })
-                  : null}
-              </div>
+              <FindProductByName
+                name={nombreProducto}
+                setters={{ setCodigo }}
+                refInput={refInputPN ? refInputPN : null}
+              />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Cantidad
               </label>
@@ -289,10 +325,14 @@ export default function CreateTickets() {
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                placeholder="0"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
-            <AddToTabe editandoId={editandoId} label={"Agregar Producto para generar"}/>
+            <AddToTabe
+              editandoId={editandoId}
+              label={"Agregar Producto para generar"}
+            />
           </form>
         </div>
 
@@ -300,6 +340,7 @@ export default function CreateTickets() {
           eliminarProducto={eliminarProducto}
           productos={productos}
           guardarRegistro={guardarRegistro}
+          editarProducto={editarProducto}
         />
         <div className="ml-5 mt-6 flex justify-between items-center">
           <button

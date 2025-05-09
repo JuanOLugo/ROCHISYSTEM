@@ -33,7 +33,7 @@ function FindProductByName({ name, setters, refInput }) {
     return (
       <div
         ref={refContainer}
-        className={`absolute overflow-y-scroll  bg-gray-800 border border-gray-700 focus:border-primary text-gray-200 h-40 w-72 my-2 rounded-md font-light  ${
+        className={`absolute overflow-y-scroll  bg-slate-50 border border-slate-100 shadow-lg focus:border-primary text-gray-900 h-40 w-72 my-2 rounded-md font-light  ${
           products.length == 0 || !handleFocus ? "hidden" : "block"
         }`}
       >
@@ -44,10 +44,10 @@ function FindProductByName({ name, setters, refInput }) {
                 <div
                   ref={refContainer}
                   key={i}
-                  className="hover:bg-white w-full pl-1 cursor-pointer py-2 border-b hover:text-gray-800 transition-all"
+                  className="hover:bg-white  w-full pl-1 cursor-pointer py-2 border-b border-gray-900 hover:text-gray-800 transition-all"
                 >
                   <h1
-                    className="w-full text-start cursor-pointer"
+                    className="w-full text-start transition-all hover:text-xl cursor-pointer"
                     onClick={() => {
                       setters.setCodigo(e.code);
                       sethandleBlur(true);

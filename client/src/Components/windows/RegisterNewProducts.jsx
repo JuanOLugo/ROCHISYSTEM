@@ -101,14 +101,14 @@ export default function RegisterNewProducts() {
   }, [codigo]);
 
   useEffect(() => {
-    if (productos.length > 7) {
+    if (productos.length > 5) {
       ref.current.scrollTop = ref.current.scrollHeight;
     }
   }, [productos]);
 
-  useEffect(() => {
-    console.log(productos);
-  }, [productos]);
+
+
+
 
   const AddAndEditProducts = (e) => {
     e.preventDefault();
@@ -199,14 +199,7 @@ export default function RegisterNewProducts() {
     setProductos(productos.filter((p) => p._id !== id));
   };
 
-  const calcularTotal = () => {
-    return productos.reduce((total, producto) => {
-      return (
-        total +
-        producto.precio * producto.cantidad * (1 - producto.descuento / 100)
-      );
-    }, 0);
-  };
+
 
   const guardarRegistro = async () => {
     // Aquí iría la lógica para guardar la factura
@@ -253,7 +246,7 @@ export default function RegisterNewProducts() {
   };
 
   return (
-    <div className="bg-gray-900 h-screen grid">
+    <div className="bg-white h-screen grid">
       <ToastContainer
         position="bottom-right"
         autoClose={5000}
@@ -277,7 +270,7 @@ export default function RegisterNewProducts() {
             <div>
               <label
                 htmlFor="codigo"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Código
               </label>
@@ -286,21 +279,23 @@ export default function RegisterNewProducts() {
                 id="codigo"
                 type="text"
                 value={codigo}
+                placeholder="Codigo"
                 onChange={(e) => setCodigo(e.target.value)}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
             <div>
               <label
                 htmlFor="nombreProducto"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Nombre del Producto
               </label>
               <input
                 id="nombreProducto"
                 type="text"
+                placeholder="Filtra el nombre del producto"
                 value={nombreProducto}
                 ref={refInputPN}
                 onChange={(e) => {
@@ -316,7 +311,7 @@ export default function RegisterNewProducts() {
                   }
                 }}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
               <FindProductByName
                 name={nombreProducto}
@@ -327,54 +322,57 @@ export default function RegisterNewProducts() {
             <div>
               <label
                 htmlFor="costPrice"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Precio de costo
               </label>
               <input
                 id="costPrice"
                 type="number"
+                placeholder="Precio de costo"
                 value={precioCosto}
                 onChange={(e) => setprecioCosto(e.target.value)}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
             <div>
               <label
                 htmlFor="sellPrice"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Precio de venta
               </label>
               <input
                 id="sellPrice"
                 type="number"
+                placeholder="Precio de venta"
                 value={precioVenta}
                 onChange={(e) => setprecioVenta(e.target.value)}
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
             <div>
               <label
                 htmlFor="cantidad"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Cantidad
               </label>
               <input
                 id="cantidad"
                 type="number"
+                placeholder="Cantidad"
                 value={cantidad}
                 onChange={(e) => setCantidad(Number(e.target.value))}
                 required
-                className="w-full px-3 py-1 bg-gray-800 border border-gray-700 focus:border-primary text-gray-200"
+                className="w-full px-3 py-1 bg-white border border-gray-700 focus:border-primary text-gray-900 rounded-md"
               />
             </div>
             <div className=" flex  ">
               <label
                 htmlFor="costPrice"
-                className="block text-sm   lg:text-base font-normal text-gray-200 mb-1"
+                className="block text-sm   lg:text-base font-normal text-gray-900 mb-1"
               >
                 Generar Ticket
               </label>
@@ -399,7 +397,7 @@ export default function RegisterNewProducts() {
         <div className="ml-5 mt-6 flex justify-between items-center">
           <button
             onClick={guardarRegistro}
-            className=" text-white py-1  px-4  bg-emerald-500 hover:bg-emerald-400 transition duration-300 border border-emerald-900"
+            className=" text-white py-1  px-4 shadow-md rounded-md bg-emerald-500 hover:bg-emerald-600 transition duration-300 border border-emerald-400"
           >
             Guardar registro
           </button>

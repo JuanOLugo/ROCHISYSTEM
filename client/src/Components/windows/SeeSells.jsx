@@ -80,25 +80,25 @@ export default function SeeSells() {
         value={filtro}
       />
       <div className="h-96 overflow-y-scroll ">
-        <table className="min-w-full bg-gray-800 border border-gray-700  ">
-          <thead>
+        <table className="min-w-full bg-white border border-gray-900  ">
+          <thead className="border border-gray-900 bg-slate-50 ">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Fecha
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Vendedor
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Total
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Metodo de pago
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-200 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-900 uppercase tracking-wider">
                 Acciones
               </th>
             </tr>
@@ -106,22 +106,22 @@ export default function SeeSells() {
           <tbody className="divide-y divide-gray-700  ">
             {facturas.map((factura) => (
               <tr key={factura._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {factura._id}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {factura.date}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {factura.sellerName}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
                   ${factura.totalInvoice.toLocaleString("es-CO")}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200 font-bold">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
                   {factura.payMethod}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   <button
                     onClick={() => eliminarFactura(factura._id)}
                     className="text-red-500 hover:text-red-700 mr-2"

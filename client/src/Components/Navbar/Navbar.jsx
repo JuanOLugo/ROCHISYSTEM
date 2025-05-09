@@ -46,8 +46,8 @@ export default function Navbar() {
 
   return (
     <>
-    <div className={`absolute w-full h-11 top-0 left-0  ${OnIn ? "hidden" : "block"}`} onMouseEnter={() => setOnIn(true)}></div>
-      <nav className={` bg-gray-900 text-gray-200 shadow-lg border-b transition-all duration-500  ${!OnIn ? "-top-52 absolute w-full" : "top-0 relative"} border-gray-700`}  onMouseLeave={() => setOnIn(false)}>
+ 
+      <nav className={` bg-blue-500 text-gray-200 shadow-lg border-b transition-all duration-500   border-blue-200`}  >
       
       <div className="max-w-6xl mx-auto py-2 px-5 md:px-0 ">
         <div className="flex justify-between">

@@ -76,7 +76,7 @@ export default function ListProduct() {
   useEffect(() => {}, [pageNum]);
 
   return (
-    <div className=" p-4 bg-gray-900 h-full min-h-screen">
+    <div className=" p-4 bg-white h-full min-h-screen">
       <div className="mb-4 flex flex-wrap gap-4">
         <input
           clearable
@@ -85,7 +85,7 @@ export default function ListProduct() {
           value={codeFilter}
           maxLength={4}
           onChange={(e) => setcodeFilter(e.target.value)}
-          className="max-w-xs text-gray-200 bg-gray-800 border px-3 py-2 border-gray-700 focus:border-primary "
+          className="max-w-xs text-gray-900 bg-white rounded-md border px-3 py-2 border-gray-700 focus:border-primary "
         />
         <input
           clearable
@@ -94,20 +94,20 @@ export default function ListProduct() {
           placeholder="Nombre de producto"
           value={nameFilter}
           onChange={(e) => setnameFilter(e.target.value)}
-          className="max-w-xs text-gray-200 bg-gray-800 border px-3 py-2 border-gray-700 focus:border-primary"
+          className="max-w-xs text-gray-900 bg-white rounded-md border px-3 py-2 border-gray-700 focus:border-primary"
         />
       </div>
 
       <div>
-        <h1 className="text-sm font-bold text-white">
+        <h1 className="text-sm font-bold text-gray-900">
           Productos a mostrar por pagina
         </h1>
         <div className="flex py-2 my-1">
           <button
             className={`mx-1 text-sm p-1 ${
               pageSize === 10
-                ? "bg-gray-500 opacity-50   rounded-md text-white font-bold"
-                : "bg-gray-800    rounded-md text-white font-bold"
+                ? "bg-blue-500 opacity-50   rounded-md text-white font-bold"
+                : "bg-blue-800    rounded-md text-white font-bold"
             }`}
             onClick={() => {
               if (products.length > 9) {
@@ -131,8 +131,8 @@ export default function ListProduct() {
             }}
             className={`mx-1 text-sm p-1 ${
               pageSize === 50
-                ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
-                : "bg-gray-800    rounded-md text-white font-bold"
+                ? "bg-blue-500 opacity-50  rounded-md text-white font-bold"
+                : "bg-blue-800    rounded-md text-white font-bold"
             }`}
           >
             50
@@ -148,8 +148,8 @@ export default function ListProduct() {
             }}
             className={`mx-1 text-sm p-1 ${
               pageSize === 100
-                ? "bg-gray-500 opacity-50  rounded-md text-white font-bold"
-                : "bg-gray-800    rounded-md text-white font-bold"
+                ? "bg-blue-500 opacity-50  rounded-md text-white font-bold"
+                : "bg-blue-800    rounded-md text-white font-bold"
             }`}
           >
             100
@@ -172,16 +172,16 @@ export default function ListProduct() {
             }
           }}
           className={`${
-            pageNum > 1 ? "bg-gray-800 " : "bg-gray-400 opacity-50"
+            pageNum > 1 ? "bg-blue-500 " : "bg-gray-400 opacity-50"
           } p-2 text-white rounded-md `}
         >
           <FaChevronLeft />
         </button>
-        <h1 className="mx-4 font-bold text-gray-200">{pageNum}</h1>
+        <h1 className="mx-4 font-bold text-gray-900">{pageNum}</h1>
         <button
           className={` ${
             productspaginate.length === pageSize
-              ? "bg-gray-800 "
+              ? "bg-blue-500 "
               : "bg-gray-500 opacity-50"
           } p-2 text-white rounded-md `}
           onClick={handleUpPagination}
