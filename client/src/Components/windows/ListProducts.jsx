@@ -12,111 +12,89 @@ import { FaTrashAlt } from "react-icons/fa";
 import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
 import {
   DeleteProductAPI,
+  FilterProducts,
   GetProductAPI,
+  PaginationProducts,
 } from "../../Controllers/Product.controller";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import useListProducts from "../../Controllers/useListProducts";
+import AlertDialog from "../Modals/AlertDialog";
 
 export default function ListProduct() {
-  const [products, setProducts] = useState([]);
-  const [codeFilter, setcodeFilter] = useState("");
-  const [nameFilter, setnameFilter] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [productspaginate, setproductspaginate] = useState([]);
-  const [pageNum, setpageNum] = useState(1);
+  const [FilterText, setFilterText] = useState("");
+  const [pageNum, setpageNum] = useState(0);
   const [pageSize, setpageSize] = useState(10);
+  const [totalPages, settotalPages] = useState(0);
+  const {
+    NumDisminuir,
+    OnChangeDisminuir,
+    onChangeDialogState,
+    IdEditing,
+    isEditing,
+    onCancelDialog,
+    DialogState,
+    onConfirmDialog,
+    products,
+    setProducts,
+  } = useListProducts();
 
   useEffect(() => {
-    const data = new Promise(res => res(GetProductAPI()));
-    toast.promise(
-      data,
-      {
-        pending: "Obteniendo los productos...",
-        success: "Productos obtenidos 👌",
-        error: "Error al obtener los productos 🤯",
-      },
-      {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      }
-    );
-    data
-      .then((data) => setProducts(data.data))
-      .catch((err) =>
-        console.log("Recuerda que: " + err.response.data.message)
-      );
-  }, []);
+    PaginationProducts({ pageIndex: pageNum, pageSize }).then((data) => {
+      setProducts(data.data.products);
+      settotalPages(data.data.total);
+    });
+  }, [pageNum]);
+
+
 
   const handleDelete = useCallback(async (id) => {
     DeleteProductAPI({ id });
     setProducts((products) => products.filter((product) => product._id !== id));
-    setproductspaginate((products) =>
-      products.filter((product) => product._id !== id)
-    );
   }, []);
 
   useEffect(() => {
-    if (codeFilter.length > 0 || nameFilter.length > 0) {
-      const productsToPaginate = products.filter((product) => {
-        const matchesName = product.code
-          .toLowerCase()
-          .includes(codeFilter.toLowerCase());
-        const matchesnameFilter = product.name
-          .toLowerCase()
-          .includes(nameFilter.toLowerCase());
-        return matchesName && matchesnameFilter;
-      })
-
-      setproductspaginate(paginacion(productsToPaginate, pageSize, pageNum)
-      );
-    } else {
-      setproductspaginate(paginacion(products, 10, 1));
-      
+    if (FilterText.length > 0) {
+      FilterProducts({ text: FilterText, pageNum: 0, pageSize: 10 }).then((data) => {
+        setProducts(data.data.products);
+      });
+    }else {
+      PaginationProducts({ pageIndex: pageNum, pageSize }).then((data) => {
+        setProducts(data.data.products);
+        settotalPages(data.data.total);
+      });
     }
-  }, [codeFilter, nameFilter]);
-
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  //paginacion
-
-  const paginacion = (array, page_size, page_number) => {
-    return array.slice((page_number - 1) * page_size, page_number * page_size);
-  };
+  }, [FilterText]);
 
   useEffect(() => {
-    setproductspaginate(paginacion(products, pageSize, pageNum));
-  }, [products, pageNum, pageSize]);
+    console.log(products)
+  }, [products])
+  
 
   return (
     <div className="container mx-auto p-4">
       <ToastContainer containerId={11} />
+      <AlertDialog
+        message={
+          isEditing
+            ? "Desea disminuir el stock de este producto?"
+            : "Desea eliminar este producto?"
+        }
+        title={isEditing ? "Disminuir stock" : "Eliminar producto"}
+        onchangeState={onChangeDialogState}
+        onCancel={onCancelDialog}
+        onConfirm={onConfirmDialog}
+        state={DialogState}
+      />
       <div className="mb-4 flex flex-wrap gap-4">
         <Input
           clearable
-          label="Filtrar por codigo"
-          placeholder="Filtrar por codigo"
-          value={codeFilter}
-          onChange={(e) => setcodeFilter(e.target.value)}
-          className="max-w-xs"
-        />
-        <Input
-          clearable
-          type="text"
-          label="Nombre de producto"
-          placeholder="Nombre de producto"
-          value={nameFilter}
-          onChange={(e) => setnameFilter(e.target.value)}
+          label="Filtrar por codigo y nombre"
+          placeholder="Filtrar por codigo y nombre"
+          value={FilterText}
+          onChange={(e) => setFilterText(e.target.value)}
           className="max-w-xs"
         />
       </div>
@@ -133,8 +111,7 @@ export default function ListProduct() {
               if (products.length > 9) {
                 setpageSize(10);
                 setpageNum(1);
-                setcodeFilter("");
-                setnameFilter("");
+                setFilterText("");
               }
             }}
           >
@@ -145,8 +122,7 @@ export default function ListProduct() {
               if (products.length > 49) {
                 setpageSize(50);
                 setpageNum(1);
-                setcodeFilter("");
-                setnameFilter("");
+                setFilterText("");
               }
             }}
             className={`mx-1 text-sm p-1 ${
@@ -162,8 +138,7 @@ export default function ListProduct() {
               if (products.length > 50) {
                 setpageSize(100);
                 setpageNum(1);
-                setcodeFilter("");
-                setnameFilter("");
+                setFilterText("");
               }
             }}
             className={`mx-1 text-sm p-1 ${
@@ -198,7 +173,7 @@ export default function ListProduct() {
           <TableColumn className=" font-bold ">Acciones</TableColumn>
         </TableHeader>
         <TableBody className="border rounded-lg">
-          {productspaginate.map((product) => (
+          {products.map((product) => (
             <TableRow key={product._id} className="">
               <TableCell className="border border-blue-600 font-bold ">
                 {product.code}
@@ -218,21 +193,49 @@ export default function ListProduct() {
               <TableCell className="border border-blue-600 font-bold ">
                 {product.stock}
               </TableCell>
-              <TableCell className="border border-blue-600 font-bold ">
-                <Button
-                  color="error"
-                  auto
-                  onClick={() => handleDelete(product._id)}
-                >
-                  <div className="bg-red-500 p-2 rounded-xl">
-                    <FaTrashAlt className="text-xl text-white" />
+              <TableCell className="border border-blue-600 font-bold  ">
+                <div className="flex w-2/5">
+                  <Button
+                    color="error"
+                    auto
+                    onClick={() => handleDelete(product._id)}
+                  >
+                    <FaTrashAlt className="text-xl text-red-500" />
+                  </Button>
+
+                  <div className="flex items-center gap-3">
+                    <Button
+                      color="warning"
+                      className="text-white "
+                      onClick={() => {
+                        OnChangeDisminuir(-1, product);
+                        console.log(product.code);
+                      }}
+                      isDisabled={!isEditing || IdEditing != product.code}
+                    >
+                      -
+                    </Button>
+                    <h1>{IdEditing === product.code ? NumDisminuir : 0}</h1>
+                    <Button
+                      color="danger"
+                      className="text-white "
+                      onClick={() => OnChangeDisminuir(1, product)}
+                      isDisabled={isEditing && IdEditing !== product.code}
+                    >
+                      +
+                    </Button>
+
+                    {NumDisminuir > 0 && IdEditing == product.code ? (
+                      <Button
+                        color="success"
+                        className="text-white"
+                        onClick={() => onChangeDialogState(true)}
+                      >
+                        Guardar
+                      </Button>
+                    ) : null}
                   </div>
-                </Button>
-                <Button
-                  color="error"
-                  auto
-                  onClick={() => handleDelete(product._id)}
-                ></Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -240,31 +243,31 @@ export default function ListProduct() {
       </Table>
       <div className="flex justify-center items-center my-5 ">
         <button
+        disabled={pageNum === 0}
           onClick={() => {
-            if (pageNum > 1) {
+            if (pageNum > 0) {
               setpageNum(pageNum - 1);
-              setcodeFilter("");
-              setnameFilter("");
+              setFilterText("");
             }
           }}
           className={`${
-            pageNum > 1 ? "bg-blue-600" : "bg-gray-500 opacity-50"
+            pageNum > 0 ? "bg-blue-600" : "bg-gray-500 opacity-50"
           } p-2 text-white rounded-md `}
         >
           <FaChevronLeft />
         </button>
         <h1 className="mx-4 font-bold">{pageNum}</h1>
         <button
+        disabled={totalPages <= pageNum * pageSize}
           className={` ${
-            productspaginate.length === pageSize
+            totalPages > pageNum * pageSize
               ? "bg-blue-600"
               : "bg-gray-500 opacity-50"
           } p-2 text-white rounded-md `}
           onClick={() => {
-            if (productspaginate.length > pageSize - 1) {
+            if (totalPages > pageSize - 1) {
               setpageNum(pageNum + 1);
-              setcodeFilter("");
-              setnameFilter("");
+              setFilterText("");
             }
           }}
         >

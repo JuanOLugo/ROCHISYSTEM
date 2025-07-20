@@ -4,7 +4,7 @@ const pRouter = Router();
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
-const converter = require("json-2-csv")
+const converter = require("json-2-csv");
 pRouter.post("/create", async (req, res) => {
   const { codigo, nombre, PrecioCosto, Precioventa, proveedor, stock } =
     req.body;
@@ -65,16 +65,18 @@ pRouter.post("/update", async (req, res) => {
     const rutaDirectorio = path.join(__dirname, "Registros", FileName); // Especifica la ruta completa
 
     // Uso de promesa para escribir el archivo
-    
-    fs.writeFileSync(rutaDirectorio, converter.json2csv(productAddForTicket, (err, csv) => {
-      if(err) console.log(err)
-      return csv
-    }) );
+
+    fs.writeFileSync(
+      rutaDirectorio,
+      converter.json2csv(productAddForTicket, (err, csv) => {
+        if (err) console.log(err);
+        return csv;
+      })
+    );
 
     try {
       exec("bartend", (err, data) => {
         console.log(err);
-        console.log(data.toString());
       });
       console.log("ejecutado");
     } catch (error) {
@@ -114,6 +116,66 @@ pRouter.get("/get", async (req, res) => {
   const products = await product.find();
   if (products.length > 0) return res.status(200).send(products);
   res.status(400).send({ message: "No existen productos" });
+});
+
+pRouter.post("/disminuir", async (req, res) => {
+  const { num, _id } = req.body;
+  if (!_id) return res.status(400).send({ message: "Se necesita ID" });
+
+  const findproduct = await product.findById(_id);
+
+  if (!findproduct)
+    return res.status(400).send({ message: "Producto no encontrado" });
+
+  try {
+    const updateProduct = await product.findByIdAndUpdate(
+      findproduct._id,
+      {
+        $inc: { stock: -num }, // Decrementa stock de forma segura
+      },
+      {
+        new: true, // Devuelve el documento actualizado
+        runValidators: true, // Aplica validaciones del schema
+      }
+    );
+
+    return res.status(200).send({ message: "Disminuido correctamente" });
+  } catch (error) {
+    return res.status(400).send({ message: "No se pudo disminuir producto" });
+  }
+});
+
+pRouter.post("/page", async (req, res) => {
+  const { pageIndex, pageSize } = req.body;
+
+  const products = await product.find();
+  if (product.length) {
+    const sender = products.slice(
+      pageIndex * pageSize,
+      pageIndex * pageSize + pageSize
+    );
+    return res.send({ products: sender, total: products.length });
+  } else {
+    return res.send({ sender: [], total: products.length });
+  }
+});
+
+pRouter.post("/filter", async (req, res) => {
+  const { text, pageIndex, pageSize } = req.body;
+  const products = await product.find();
+  if (products.length > 0) {
+    const textLower = text.toLowerCase();
+
+    const sender = products.filter(
+      ({ code, name }) =>
+        code.toLowerCase().includes(textLower) ||
+        name.toLowerCase().includes(textLower)
+    );
+
+    return res.send({ products: sender, total: sender.length });
+  } else {
+    return res.send({ sender: [], total: products.length });
+  }
 });
 
 module.exports = pRouter;

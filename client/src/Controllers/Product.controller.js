@@ -18,6 +18,21 @@ export const UpdateProductsAPI = async (data) => {
 };
 
 export const DeleteProductAPI = async (data) => {
-    const response = await axios.post(proxy + "delete", data);
-    return response;
-  };
+  const response = await axios.post(proxy + "delete", data);
+  return response;
+};
+
+export const DisminuirProduct = async (data) => {
+  const response = await axios.post(proxy + "disminuir", data);
+  return response;
+};
+
+export const PaginationProducts = async (data) => {
+  const response = await axios.post(proxy + "page", data);
+  return response;
+};
+
+export const FilterProducts = async (data) => {
+  const response = await axios.post(proxy + "filter", data);
+  return response;
+};
