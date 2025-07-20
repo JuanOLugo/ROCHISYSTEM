@@ -199,7 +199,7 @@ export default function ListProduct() {
               <TableCell className="border border-blue-600 font-bold ">
                 {product.stock}
               </TableCell>
-              <TableCell className="border border-blue-600 font-bold  w-[30%]">
+              <TableCell className="border border-blue-600 font-bold  w-[45%]">
                 <div className="flex ">
                   <Button
                     color="error"
@@ -237,7 +237,7 @@ export default function ListProduct() {
                         className="text-white"
                         onClick={() => onChangeDialogState(true)}
                       >
-                        Guardar
+                        Remover
                       </Button>
                     ) : null}
                   </div>
