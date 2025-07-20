@@ -48,19 +48,22 @@ export default function ListProduct() {
     });
   }, [pageNum]);
 
+  const onChangeFilter = (text) => {
+    setFilterText(text);
+  };
 
-
-  const handleDelete = useCallback(async (id) => {
-    DeleteProductAPI({ id });
-    setProducts((products) => products.filter((product) => product._id !== id));
-  }, []);
+  const onHandleFindProducts = () => {
+    if (FilterText.length > 0) {
+      FilterProducts({ text: FilterText, pageNum: 0, pageSize: 10 }).then(
+        (data) => {
+          setProducts(data.data.products);
+        }
+      );
+    }
+  };
 
   useEffect(() => {
-    if (FilterText.length > 0) {
-      FilterProducts({ text: FilterText, pageNum: 0, pageSize: 10 }).then((data) => {
-        setProducts(data.data.products);
-      });
-    }else {
+    if (FilterText.length === 0) {
       PaginationProducts({ pageIndex: pageNum, pageSize }).then((data) => {
         setProducts(data.data.products);
         settotalPages(data.data.total);
@@ -68,10 +71,10 @@ export default function ListProduct() {
     }
   }, [FilterText]);
 
-  useEffect(() => {
-    console.log(products)
-  }, [products])
-  
+  const handleDelete = useCallback(async (id) => {
+    DeleteProductAPI({ id });
+    setProducts((products) => products.filter((product) => product._id !== id));
+  }, []);
 
   return (
     <div className="container mx-auto p-4">
@@ -88,15 +91,18 @@ export default function ListProduct() {
         onConfirm={onConfirmDialog}
         state={DialogState}
       />
-      <div className="mb-4 flex flex-wrap gap-4">
+      <div className="mb-4 flex flex-wrap gap-4 items-center">
         <Input
           clearable
           label="Filtrar por codigo y nombre"
           placeholder="Filtrar por codigo y nombre"
           value={FilterText}
-          onChange={(e) => setFilterText(e.target.value)}
+          onChange={(e) => onChangeFilter(e.target.value)}
           className="max-w-xs"
         />
+        <Button color="primary" onClick={() => onHandleFindProducts()}>
+          {"Buscar"}
+        </Button>
       </div>
       <div>
         <h1 className="text-sm font-bold">Productos a mostrar por pagina</h1>
@@ -193,8 +199,8 @@ export default function ListProduct() {
               <TableCell className="border border-blue-600 font-bold ">
                 {product.stock}
               </TableCell>
-              <TableCell className="border border-blue-600 font-bold  ">
-                <div className="flex w-2/5">
+              <TableCell className="border border-blue-600 font-bold  w-[30%]">
+                <div className="flex ">
                   <Button
                     color="error"
                     auto
@@ -243,7 +249,7 @@ export default function ListProduct() {
       </Table>
       <div className="flex justify-center items-center my-5 ">
         <button
-        disabled={pageNum === 0}
+          disabled={pageNum === 0}
           onClick={() => {
             if (pageNum > 0) {
               setpageNum(pageNum - 1);
@@ -258,7 +264,7 @@ export default function ListProduct() {
         </button>
         <h1 className="mx-4 font-bold">{pageNum}</h1>
         <button
-        disabled={totalPages <= pageNum * pageSize}
+          disabled={totalPages <= pageNum * pageSize}
           className={` ${
             totalPages > pageNum * pageSize
               ? "bg-blue-600"
